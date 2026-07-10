@@ -134,6 +134,7 @@
                 <a href="https://www.linkedin.com/in/naveen-siriwardhana-889632159/" target="_blank" class="social-link" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
                 <a href="https://github.com/naveenmadhushan1998" target="_blank" class="social-link" title="GitHub"><i class="fa-brands fa-github"></i></a>
                 <a href="https://wa.me/94742592686" target="_blank" class="social-link" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href="https://www.youtube.com/@NaveeNS" target="_blank" class="social-link hover:text-red-500" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
                 <a href="https://www.facebook.com/naveen.pasindu.7?mibextid=wwXIfr" target="_blank" class="social-link" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
                 <a href="https://www.instagram.com/naveen.siriwardhana" target="_blank" class="social-link" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
             </div>
@@ -171,7 +172,8 @@
                 </div>
             </div>
         </div>
-<!-- Interactive Tools Link Section Download Calculator-->
+
+        <!-- Interactive Tools Link Section -->
         <div class="glass-card rounded-3xl p-8 mt-6">
             <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-6 font-bold flex items-center gap-2">
                 <span class="text-emerald-500">//</span> Interactive Lab
@@ -189,8 +191,9 @@
                 </a>
             </div>
         </div>
+
         <!-- Downloads & CV Section -->
-        <div class="glass-card rounded-3xl p-8">
+        <div class="glass-card rounded-3xl p-8 mt-6">
             <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-6 font-bold flex items-center gap-2">
                 <span class="text-emerald-500">//</span> Professional Assets
             </h3>
@@ -210,7 +213,7 @@
             </div>
         </div>
 
-        <!-- Marketplace / For Sale Section (Added mt-6 for spacing) -->
+        <!-- Marketplace / For Sale Section -->
         <div class="glass-card rounded-3xl p-8 mt-6">
             <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-6 font-bold flex items-center gap-2">
                 <span class="text-emerald-500">//</span> Personal Marketplace
@@ -252,7 +255,6 @@
         const themeIcon = document.getElementById('theme-icon');
         const htmlElement = document.documentElement;
 
-        // Check for saved theme preference, otherwise use dark mode as default
         const currentTheme = localStorage.getItem('theme') || 'dark';
         
         if (currentTheme === 'light') {
@@ -263,7 +265,6 @@
             themeIcon.className = 'fa-solid fa-moon';
         }
 
-        // Toggle theme function
         themeToggleBtn.addEventListener('click', () => {
             if (htmlElement.classList.contains('light')) {
                 htmlElement.classList.remove('light');
