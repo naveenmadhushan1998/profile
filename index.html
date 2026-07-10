@@ -18,25 +18,51 @@
             --deep-blue: #0a192f;
             --emerald-glow: #10b981;
             --slate-accent: #64748b;
+            
+            /* Dark Mode Colors */
+            --bg-color: #0a192f;
+            --text-main: #white;
+            --text-sub: #e2e8f0;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover-bg: rgba(255, 255, 255, 0.04);
+            --inner-box: rgba(255, 255, 255, 0.05);
+            --grid-color: rgba(16, 185, 129, 0.05);
         }
+
+        /* Light Mode Overrides */
+        html.light {
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(15, 23, 42, 0.08);
+            --card-hover-bg: rgba(255, 255, 255, 0.95);
+            --inner-box: rgba(15, 23, 42, 0.04);
+            --grid-color: rgba(16, 185, 129, 0.08);
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--deep-blue);
-            color: #e2e8f0;
+            background-color: var(--bg-color);
+            color: var(--text-sub);
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
         .mono { font-family: 'JetBrains Mono', monospace; }
         
         /* Premium Glassmorphism Card Style */
         .glass-card {
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--card-bg);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glass-card:hover {
             border-color: var(--emerald-glow);
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--card-hover-bg);
             box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.1);
         }
         
@@ -46,7 +72,7 @@
         
         /* Tech Grid Background */
         .grid-bg {
-            background-image: radial-gradient(circle at 2px 2px, rgba(16, 185, 129, 0.05) 1px, transparent 0);
+            background-image: radial-gradient(circle at 2px 2px, var(--grid-color) 1px, transparent 0);
             background-size: 30px 30px;
         }
 
@@ -58,6 +84,7 @@
 
         .social-link {
             transition: all 0.2s ease;
+            color: var(--text-muted);
         }
         .social-link:hover {
             color: var(--emerald-glow);
@@ -67,7 +94,14 @@
 </head>
 <body class="grid-bg min-h-screen py-12 px-4 md:px-8">
 
-    <div class="max-w-3xl mx-auto container">
+    <div class="max-w-3xl mx-auto container relative">
+        
+        <!-- Light/Dark Mode Floating Button -->
+        <div class="flex justify-end mb-4">
+            <button id="theme-toggle" class="glass-card p-3 rounded-xl text-xl text-emerald-400 hover:text-emerald-300 focus:outline-none cursor-pointer" title="Toggle Theme">
+                <i id="theme-icon" class="fa-solid fa-moon"></i>
+            </button>
+        </div>
         
         <!-- Profile Main Card -->
         <div class="glass-card rounded-3xl p-8 text-center mb-8 relative overflow-hidden">
@@ -78,11 +112,11 @@
             <!-- Profile Image -->
             <div class="relative inline-block mb-6">
                 <img src="profile.jpg" alt="Naveen Siriwardhana" class="w-32 h-32 rounded-full object-cover border-2 border-emerald-500/40 p-1 mx-auto" onerror="this.src='https://via.placeholder.com/150'">
-                <span class="absolute bottom-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-[#0a192f] rounded-full"></span>
+                <span class="absolute bottom-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-current rounded-full text-slate-900 dark:text-[#0a192f]"></span>
             </div>
 
             <!-- Name & Title -->
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 text-white">
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2" style="color: var(--text-main);">
                 Naveen Siriwardhana
             </h1>
             <p class="mono text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-4 glow-text">
@@ -90,12 +124,12 @@
             </p>
             
             <!-- Contact Email Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-slate-300 mono mb-8">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-sm mono mb-8" style="color: var(--text-sub);">
                 <i class="fa-regular fa-envelope text-emerald-400"></i> naveenmadhushan@gmail.com
             </div>
 
             <!-- Social Links Grid -->
-            <div class="flex flex-wrap justify-center gap-6 text-xl text-slate-400 border-t border-white/5 pt-6">
+            <div class="flex flex-wrap justify-center gap-6 text-xl border-t border-emerald-500/10 pt-6">
                 <a href="mailto:naveenmadhushan@gmail.com" class="social-link" title="Email"><i class="fa-solid fa-envelope"></i></a>
                 <a href="https://www.linkedin.com/in/naveen-siriwardhana-889632159/" target="_blank" class="social-link" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
                 <a href="https://github.com/naveenmadhushan1998" target="_blank" class="social-link" title="GitHub"><i class="fa-brands fa-github"></i></a>
@@ -111,33 +145,34 @@
                 <span class="text-emerald-500">//</span> Briefly about me
             </h3>
             
-            <div class="space-y-4 text-slate-300">
-                <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+            <div class="space-y-4">
+                <div class="flex items-start gap-3 p-3 rounded-xl border border-emerald-500/5" style="background: var(--inner-box);">
                     <span class="text-xl text-emerald-400 mt-0.5"><i class="fa-solid fa-laptop-code"></i></span>
                     <div>
-                        <p class="font-semibold text-white">Senior Systems and Infrastructure Engineer</p>
-                        <p class="text-sm text-slate-400">Crystal Martin Galagedara</p>
+                        <p class="font-semibold" style="color: var(--text-main);">Senior Systems and Infrastructure Engineer</p>
+                        <p class="text-sm" style="color: var(--text-muted);">Crystal Martin Galagedara</p>
                     </div>
                 </div>
 
-                <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+                <div class="flex items-start gap-3 p-3 rounded-xl border border-emerald-500/5" style="background: var(--inner-box);">
                     <span class="text-xl text-emerald-400 mt-0.5"><i class="fa-solid fa-graduation-cap"></i></span>
                     <div>
-                        <p class="font-semibold text-white">SLIIT Graduate</p>
-                        <p class="text-sm text-slate-400">Bandarawela Central College Alumnus</p>
+                        <p class="font-semibold" style="color: var(--text-main);">SLIIT Graduate</p>
+                        <p class="text-sm" style="color: var(--text-muted);">Bandarawela Central College Alumnus</p>
                     </div>
                 </div>
 
-                <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+                <div class="flex items-start gap-3 p-3 rounded-xl border border-emerald-500/5" style="background: var(--inner-box);">
                     <span class="text-xl text-emerald-400 mt-0.5"><i class="fa-solid fa-location-dot"></i></span>
                     <div>
-                        <p class="font-semibold text-white">Location</p>
-                        <p class="text-sm text-slate-400">Currently living in Kandy, Sri Lanka</p>
+                        <p class="font-semibold" style="color: var(--text-main);">Location</p>
+                        <p class="text-sm" style="color: var(--text-muted);">Currently living in Kandy, Sri Lanka</p>
                     </div>
                 </div>
             </div>
         </div>
-       <!-- Downloads & CV Section -->
+
+        <!-- Downloads & CV Section -->
         <div class="glass-card rounded-3xl p-8">
             <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-6 font-bold flex items-center gap-2">
                 <span class="text-emerald-500">//</span> Professional Assets
@@ -145,15 +180,15 @@
             
             <div class="space-y-4">
                 <!-- CV Card (Clickable) -->
-                <a href="https://drive.google.com/file/d/15t2ZqrNphNLH6pC4CeigD6V8NtoiDE83/view?usp=sharing" target="_blank" class="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/30 hover:bg-white/10 transition-all group">
+                <a href="https://drive.google.com/file/d/15t2ZqrNphNLH6pC4CeigD6V8NtoiDE83/view?usp=sharing" target="_blank" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
                     <div class="flex items-start gap-4">
                         <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-regular fa-file-pdf"></i></span>
                         <div>
-                            <p class="font-semibold text-white group-hover:text-emerald-400 transition-colors">Curriculum Vitae (CV)</p>
-                            <p class="text-sm text-slate-400">Click to view or download my latest professional resume.</p>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Curriculum Vitae (CV)</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Click to view or download my latest professional resume.</p>
                         </div>
                     </div>
-                    <span class="text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"><i class="fa-solid fa-arrow-up-right-from-square text-sm"></i></span>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-up-right-from-square text-sm"></i></span>
                 </a>
             </div>
         </div>
@@ -166,41 +201,63 @@
             
             <div class="space-y-4">
                 <!-- Bike Sale Card -->
-                <div class="p-4 rounded-xl bg-white/5 border border-white/5">
+                <div class="p-4 rounded-xl border border-emerald-500/5" style="background: var(--inner-box);">
                     <div class="flex items-start gap-4 mb-4">
                         <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-motorcycle"></i></span>
                         <div>
                             <span class="px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 rounded text-[10px] mono text-amber-400 font-bold uppercase tracking-wider">For Sale</span>
-                            <h4 class="font-bold text-white text-lg mt-1">Bajaj Pulsar N160 Premium</h4>
-                            <p class="text-sm text-slate-400">Looking for a powerful, stylish, and incredibly safe street                        bike?<br> This well-maintained Bajaj Pulsar N160 Premium is ready for a new rider. It has been ridden with care, regularly serviced, and runs like a dream.<br>*Key Features: Premium USD front forks, Dual-Channel ABS, digital console with Bluetooth, and sharp LED projector headlamps.</p>
+                            <h4 class="font-bold text-lg mt-1" style="color: var(--text-main);">Bajaj Pulsar N160 Premium</h4>
+                            <p class="text-sm" style="color: var(--text-sub);">Looking for a powerful, stylish, and incredibly safe street bike?<br> This well-maintained Bajaj Pulsar N160 Premium is ready for a new rider. It has been ridden with care, regularly serviced, and runs like a dream.<br><span class="text-xs font-semibold" style="color: var(--text-muted);">*Key Features: Premium USD front forks, Dual-Channel ABS, digital console with Bluetooth, and sharp LED projector headlamps.</span></p>
                         </div>
                     </div>
                     
                     <!-- Quick Specs Inside the box -->
-                    <div class="grid grid-cols-2 gap-2 mb-4 mono text-xs text-slate-300 bg-[#0a192f]/50 p-3 rounded-lg border border-white/5">
-                        <div><span class="text-slate-500">Engine:</span> 160 cc</div>
-                        <div><span class="text-slate-500">Condition:</span> Superb</div>
-                        <div><span class="text-slate-500">Ownership:</span> First Owner</div>
-                        <div><span class="text-slate-500">Documents:</span> All documents available (RC, valid  				insurance)</div>
-                        <div><span class="text-slate-500">Milage:</span> 5200</div>
-                        <div><span class="text-slate-500"> Year of registration:</span> 2025 July</div>
-                        
-
-
-                        
+                    <div class="grid grid-cols-2 gap-2 mb-4 mono text-xs p-3 rounded-lg border border-emerald-500/5" style="background: var(--bg-color); color: var(--text-sub);">
+                        <div><span style="color: var(--text-muted);">Engine:</span> 160 cc</div>
+                        <div><span style="color: var(--text-muted);">Condition:</span> Superb</div>
+                        <div><span style="color: var(--text-muted);">Ownership:</span> First Owner</div>
+                        <div><span style="color: var(--text-muted);">Documents:</span> All documents available (RC, valid insurance)</div>
+                        <div><span style="color: var(--text-muted);">Mileage:</span> 5200KM</div>
+                        <div><span style="color: var(--text-muted);">Year of registration:</span> 2025 July</div>
                     </div>
 
                     <!-- Drive Link Button -->
-                    <a href="https://drive.google.com/drive/folders/15Lqz8xiEHY7V372m9BEcR3P_vEivcd63?usp=sharing"      target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-[#0a192f] font-bold text-sm rounded-xl transition-all transform hover:scale-[1.02]">
+                    <a href="https://drive.google.com/drive/folders/15Lqz8xiEHY7V372m9BEcR3P_vEivcd63?usp=sharing" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-sm rounded-xl transition-all transform hover:scale-[1.02]">
                         <i class="fa-regular fa-images"></i> View Bike Photos & Details
                     </a>
                 </div>
             </div>
         </div>
+    </div>
 
     <script>
-        // Set dynamic year
-        document.getElementById('year').textContent = new Date().getFullYear();
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlElement = document.documentElement;
+
+        // Check for saved theme preference, otherwise use dark mode as default
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        
+        if (currentTheme === 'light') {
+            htmlElement.classList.add('light');
+            themeIcon.className = 'fa-solid fa-sun';
+        } else {
+            htmlElement.classList.remove('light');
+            themeIcon.className = 'fa-solid fa-moon';
+        }
+
+        // Toggle theme function
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('light')) {
+                htmlElement.classList.remove('light');
+                themeIcon.className = 'fa-solid fa-moon';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlElement.classList.add('light');
+                themeIcon.className = 'fa-solid fa-sun';
+                localStorage.setItem('theme', 'light');
+            }
+        });
     </script>
 </body>
 </html>
