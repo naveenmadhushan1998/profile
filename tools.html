@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Tools | Naveen Siriwardhana</title>
+    
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    
+    <style>
+        :root {
+            --bg-color: #0a192f;
+            --text-main: #white;
+            --text-sub: #e2e8f0;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --inner-box: rgba(255, 255, 255, 0.05);
+            --grid-color: rgba(16, 185, 129, 0.05);
+            --input-bg: rgba(10, 25, 47, 0.7);
+        }
+
+        html.light {
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(15, 23, 42, 0.08);
+            --inner-box: rgba(15, 23, 42, 0.04);
+            --grid-color: rgba(16, 185, 129, 0.08);
+            --input-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-sub);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+        }
+        
+        .grid-bg {
+            background-image: radial-gradient(circle at 2px 2px, var(--grid-color) 1px, transparent 0);
+            background-size: 30px 30px;
+        }
+    </style>
+</head>
+<body class="grid-bg min-h-screen py-12 px-4 md:px-8">
+
+    <div class="max-w-2xl mx-auto container">
+        
+        <!-- Navigation / Back Button -->
+        <div class="flex justify-between items-center mb-8">
+            <a href="index.html" class="glass-card px-4 py-2 rounded-xl text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Back to Profile
+            </a>
+            
+            <!-- Theme Toggle -->
+            <button id="theme-toggle" class="glass-card p-3 rounded-xl text-emerald-400 hover:text-emerald-300 focus:outline-none cursor-pointer">
+                <i id="theme-icon" class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+
+        <!-- Tool Card -->
+        <div class="glass-card rounded-3xl p-8 shadow-xl">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl text-emerald-400"><i class="fa-solid fa-cloud-arrow-down"></i></span>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight" style="color: var(--text-main);">Download Speed Calculator</h1>
+                    <p class="text-xs mono uppercase tracking-wider text-emerald-400">// Network & Transfer Time</p>
+                </div>
+            </div>
+
+            <hr class="border-emerald-500/10 mb-6">
+
+            <!-- Inputs Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- File Size Input -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2" style="color: var(--text-main);">File Size</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="file-size" value="1" min="0.1" step="any" class="w-full p-3 rounded-xl border border-emerald-500/20 focus:border-emerald-400 focus:outline-none mono text-center" style="background: var(--input-bg); color: var(--text-main);">
+                        <select id="size-unit" class="p-3 rounded-xl border border-emerald-500/20 focus:border-emerald-400 focus:outline-none font-semibold cursor-pointer" style="background: var(--input-bg); color: var(--text-main);">
+                            <option value="GB">GB</option>
+                            <option value="MB">MB</option>
+                            <option value="TB">TB</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Internet Speed Input -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2" style="color: var(--text-main);">Internet Speed (Bandwidth)</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="net-speed" value="50" min="0.1" step="any" class="w-full p-3 rounded-xl border border-emerald-500/20 focus:border-emerald-400 focus:outline-none mono text-center" style="background: var(--input-bg); color: var(--text-main);">
+                        <span class="p-3 rounded-xl border border-emerald-500/20 font-bold flex items-center justify-center min-w-[75px] text-sm" style="background: var(--inner-box); color: var(--text-muted);">Mbps</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Infrastructure Presets -->
+            <div class="mb-8 p-4 rounded-xl border border-emerald-500/5" style="background: var(--inner-box);">
+                <p class="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-3"><i class="fa-solid fa-sliders"></i> Quick Presets (File Size)</p>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="setPreset(4.7, 'GB')" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-semibold border border-emerald-500/10 transition-all cursor-pointer">Standard ISO (4.7 GB)</button>
+                    <button onclick="setPreset(50, 'GB')" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-semibold border border-emerald-500/10 transition-all cursor-pointer">Server Backup (50 GB)</button>
+                    <button onclick="setPreset(700, 'MB')" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-semibold border border-emerald-500/10 transition-all cursor-pointer">Linux Image (700 MB)</button>
+                </div>
+            </div>
+
+            <!-- Result Box -->
+            <div class="p-6 rounded-2xl border border-emerald-500/20 text-center relative overflow-hidden bg-gradient-to-br from-emerald-500/5 to-transparent">
+                <p class="text-xs uppercase tracking-widest text-emerald-400 font-bold mb-2">Estimated Transfer Time</p>
+                <div id="result-display" class="text-3xl md:text-4xl font-extrabold tracking-tight my-2 text-emerald-400">
+                    00h : 02m : 43s
+                </div>
+                <p id="technical-note" class="text-[11px] font-medium mt-3" style="color: var(--text-muted);">
+                    Calculated assuming a stable 50 Mbps connection.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileSizeInput = document.getElementById('file-size');
+        const sizeUnitSelect = document.getElementById('size-unit');
+        const netSpeedInput = document.getElementById('net-speed');
+        const resultDisplay = document.getElementById('result-display');
+        const technicalNote = document.getElementById('technical-note');
+
+        function calculateTime() {
+            let size = parseFloat(fileSizeInput.value) || 0;
+            const unit = sizeUnitSelect.value;
+            let speedMbps = parseFloat(netSpeedInput.value) || 0;
+
+            if (size <= 0 || speedMbps <= 0) {
+                resultDisplay.textContent = "00h : 00m : 00s";
+                technicalNote.textContent = "Please enter valid numbers.";
+                return;
+            }
+
+            // Convert size to Megabytes (MB)
+            let sizeMB = size;
+            if (unit === 'GB') sizeMB = size * 1024;
+            if (unit === 'TB') sizeMB = size * 1024 * 1024;
+
+            // Convert size to Megabits (Mb) because network speed is in Megabits per second (Mbps)
+            let sizeMegabits = sizeMB * 8;
+
+            // Calculate total seconds
+            let totalSeconds = sizeMegabits / speedMbps;
+
+            // Break down to Hours, Minutes, Seconds
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = Math.round(totalSeconds % 60);
+
+            // Format strings
+            let hStr = hours.toString().padStart(2, '0') + 'h';
+            let mStr = minutes.toString().padStart(2, '0') + 'm';
+            let sStr = seconds.toString().padStart(2, '0') + 's';
+
+            resultDisplay.textContent = `${hStr} : ${mStr} : ${sStr}`;
+            technicalNote.textContent = `Calculated at a steady transfer rate of ${speedMbps} Mbps.`;
+        }
+
+        function setPreset(val, unit) {
+            fileSizeInput.value = val;
+            sizeUnitSelect.value = unit;
+            calculateTime();
+        }
+
+        // Event Listeners for real-time calculations
+        fileSizeInput.addEventListener('input', calculateTime);
+        sizeUnitSelect.addEventListener('change', calculateTime);
+        netSpeedInput.addEventListener('input', calculateTime);
+
+        // Theme Toggle Setup
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlElement = document.documentElement;
+
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        if (currentTheme === 'light') {
+            htmlElement.classList.add('light');
+            themeIcon.className = 'fa-solid fa-sun';
+        } else {
+            htmlElement.classList.remove('light');
+            themeIcon.className = 'fa-solid fa-moon';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('light')) {
+                htmlElement.classList.remove('light');
+                themeIcon.className = 'fa-solid fa-moon';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlElement.classList.add('light');
+                themeIcon.className = 'fa-solid fa-sun';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Initial Calculation on Load
+        calculateTime();
+    </script>
+</body>
+</html>
