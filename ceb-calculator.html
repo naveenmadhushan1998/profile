@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEB Electricity Bill Calculator | Naveen Siriwardhana</title>
+    
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0a192f;
+            --text-main: #ffffff;
+            --text-sub: #e2e8f0;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --inner-box: rgba(255, 255, 255, 0.05);
+            --grid-color: rgba(16, 185, 129, 0.05);
+            --amber-glow: #f59e0b;
+        }
+
+        html.light {
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(15, 23, 42, 0.08);
+            --inner-box: rgba(15, 23, 42, 0.04);
+            --grid-color: rgba(16, 185, 129, 0.08);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-sub);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+        }
+    </style>
+</head>
+<body class="min-h-screen py-12 px-4 md:px-8 bg-[radial-gradient(circle_at_2px_2px,var(--grid-color)_1px,transparent_0)] bg-[size:30px_30px]">
+
+    <div class="max-w-2xl mx-auto container">
+        
+        <!-- Back to Home & Theme Toggle -->
+        <div class="flex justify-between items-center mb-8">
+            <a href="index.html" class="glass-card px-4 py-2 rounded-xl text-sm font-semibold hover:text-emerald-400 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Back to Portfolio
+            </a>
+            <button id="theme-toggle" class="glass-card p-3 rounded-xl text-xl text-emerald-400 hover:text-emerald-300 focus:outline-none cursor-pointer">
+                <i id="theme-icon" class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+
+        <!-- Tool Header -->
+        <div class="glass-card rounded-3xl p-6 text-center mb-6 relative overflow-hidden">
+            <div class="inline-flex p-3 rounded-2xl bg-amber-500/10 text-amber-400 text-2xl mb-3">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2" style="color: var(--text-main);">
+                CEB Electricity Bill Calculator
+            </h1>
+            <p class="text-sm" style="color: var(--text-muted);">
+                ශ්‍රී ලංකා විදුලිබල මණ්ඩලයේ නවතම ගාස්තු ක්‍රමයට අනුව ඔබේ විදුලි බිල සහ ස්මාර්ට් උපදෙස් ලබාගන්න.
+            </p>
+        </div>
+
+        <!-- Main Calculator Card -->
+        <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
+            
+            <!-- Input Field -->
+            <div>
+                <label class="block text-sm font-semibold mb-2" style="color: var(--text-main);">භාවිතා කළ Units ගණන (Monthly Consumption):</label>
+                <div class="relative">
+                    <input type="number" id="units-input" min="0" placeholder="e.g. 75" class="w-full bg-transparent border rounded-2xl py-3 px-4 outline-none transition-all font-bold text-lg focus:border-amber-500" style="border-color: var(--card-border); color: var(--text-main);">
+                    <span class="absolute right-4 top-3.5 text-sm font-bold opacity-60">Units</span>
+                </div>
+            </div>
+
+            <!-- Calculate Button -->
+            <button onclick="calculateCEBBill()" class="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold rounded-2xl transition-all transform hover:scale-[1.01] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/10">
+                <i class="fa-solid fa-calculator"></i> බිල ගණනය කරන්න
+            </button>
+
+            <!-- Results Display Area -->
+            <div id="results-area" class="hidden space-y-6 border-t border-dashed pt-6" style="border-color: var(--card-border);">
+                
+                <!-- Total Bill Highlight -->
+                <div class="text-center p-6 rounded-2xl bg-amber-500/5 border border-amber-500/20">
+                    <p class="text-xs uppercase tracking-wider font-bold text-amber-400 mb-1">Estimated Monthly Bill</p>
+                    <p class="text-4xl font-black mono text-amber-500">Rs. <span id="total-bill">0.00</span></p>
+                </div>
+
+                <!-- Breakdown Details -->
+                <div class="rounded-2xl p-4 space-y-3 text-sm" style="background: var(--inner-box);">
+                    <div class="flex justify-between">
+                        <span style="color: var(--text-muted);">Unit Charge (භාවිතා කල ඒකක සදහා ගාස්තුව):</span>
+                        <span class="font-bold" style="color: var(--text-main);">Rs. <span id="unit-charge">0.00</span></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span style="color: var(--text-muted);">Fixed Charge (ස්ථාවර ගාස්තුව):</span>
+                        <span class="font-bold" style="color: var(--text-main);">Rs. <span id="fixed-charge">0.00</span></span>
+                    </div>
+                </div>
+
+                <!-- Smart Recommendations Box -->
+                <div id="recommendation-box" class="p-4 rounded-2xl border flex items-start gap-3 bg-emerald-500/5 border-emerald-500/20">
+                    <span class="text-xl text-emerald-400 mt-0.5"><i class="fa-regular fa-lightbulb"></i></span>
+                    <div>
+                        <p class="font-bold text-emerald-400 text-sm">Smart Recommendation</p>
+                        <p id="recommendation-text" class="text-xs mt-1 leading-relaxed" style="color: var(--text-sub);"></p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function calculateCEBBill() {
+            const unitsInput = document.getElementById('units-input').value;
+            if (unitsInput === '' || unitsInput < 0) return alert('කරුණාකර වලංගු Units ගණනක් ඇතුළත් කරන්න.');
+            
+            const units = parseFloat(unitsInput);
+            let unitCharge = 0;
+            let fixedCharge = 0;
+
+            // CEB Domestic Tariff Slab Calculation Logic
+            if (units <= 60) {
+                // Block-based calculation for < 60
+                if (units <= 30) {
+                    unitCharge = units * 8;
+                    fixedCharge = 150;
+                } else {
+                    unitCharge = (30 * 8) + ((units - 30) * 15);
+                    fixedCharge = 300;
+                }
+            } else {
+                // Continuous slab calculation for > 60
+                if (units <= 90) {
+                    unitCharge = (60 * 16) + ((units - 60) * 22);
+                    fixedCharge = 400;
+                } else if (units <= 120) {
+                    unitCharge = (60 * 16) + (30 * 22) + ((units - 90) * 30);
+                    fixedCharge = 1000;
+                } else if (units <= 180) {
+                    unitCharge = (60 * 16) + (30 * 22) + (30 * 30) + ((units - 120) * 50);
+                    fixedCharge = 1500;
+                } else {
+                    unitCharge = (60 * 16) + (30 * 22) + (30 * 30) + (60 * 50) + ((units - 180) * 75);
+                    fixedCharge = 2000;
+                }
+            }
+
+            const totalBill = unitCharge + fixedCharge;
+
+            // Update UI
+            document.getElementById('total-bill').innerText = totalBill.toFixed(2);
+            document.getElementById('unit-charge').innerText = unitCharge.toFixed(2);
+            document.getElementById('fixed-charge').innerText = fixedCharge.toFixed(2);
+            
+            // Generate Smart Recommendation
+            generateRecommendation(units, totalBill);
+
+            document.getElementById('results-area').classList.remove('hidden');
+        }
+
+        function calculateHelper(units) {
+            let unitCharge = 0;
+            let fixedCharge = 0;
+            if (units <= 60) {
+                if (units <= 30) { unitCharge = units * 8; fixedCharge = 150; }
+                else { unitCharge = (30 * 8) + ((units - 30) * 15); fixedCharge = 300; }
+            } else {
+                if (units <= 90) { unitCharge = (60 * 16) + ((units - 60) * 22); fixedCharge = 400; }
+                else if (units <= 120) { unitCharge = (60 * 16) + (30 * 22) + ((units - 90) * 30); fixedCharge = 1000; }
+                else if (units <= 180) { unitCharge = (60 * 16) + (30 * 22) + (30 * 30) + ((units - 120) * 50); fixedCharge = 1500; }
+                else { unitCharge = (60 * 16) + (30 * 22) + (30 * 30) + (60 * 50) + ((units - 180) * 75); fixedCharge = 2000; }
+            }
+            return unitCharge + fixedCharge;
+        }
+
+        function generateRecommendation(currentUnits, currentBill) {
+            const recTextElement = document.getElementById('recommendation-text');
+            const recBox = document.getElementById('recommendation-box');
+            
+            // Define Slab Limits
+            const targets = [30, 60, 90, 120, 180];
+            let targetUnits = null;
+
+            // Find the immediate lower slab target
+            for (let i = targets.length - 1; i >= 0; i--) {
+                if (currentUnits > targets[i]) {
+                    targetUnits = targets[i];
+                    break;
+                }
+            }
+
+            if (targetUnits !== null) {
+                const unitsToReduce = Math.ceil(currentUnits - targetUnits);
+                // We calculate if they reduce just enough to hit the lower slab limit
+                if (unitsToReduce <= 15) { 
+                    const targetBill = calculateHelper(targetUnits);
+                    const savings = currentBill - targetBill;
+
+                    if (savings > 0) {
+                        recBox.className = "p-4 rounded-2xl border flex items-start gap-3 bg-emerald-500/5 border-emerald-500/20";
+                        recTextElement.innerHTML = `ඔයා මේ මාසේ තව <strong>Units ${unitsToReduce}ක්</strong> අඩු කරගෙන <strong>Units ${targetUnits} සීමාවට</strong> ආවොත්, ස්ථාවර ගාස්තු සහ ඉහළ Unit මිලෙන් බේරිලා රුපියල් <strong>${savings.toFixed(2)} ක්</strong> ඉතුරු කරගන්න පුළුවන්!`;
+                        return;
+                    }
+                }
+            }
+            
+            // Default generic tip if they are safely inside a slab border
+            recBox.className = "p-4 rounded-2xl border flex items-start gap-3 bg-blue-500/5 border-blue-500/20";
+            document.querySelector('#recommendation-box span').className = "text-xl text-blue-400 mt-0.5";
+            document.querySelector('#recommendation-box p').className = "font-bold text-blue-400 text-sm";
+            recTextElement.innerHTML = "ඔබ දැනට ආරක්ෂිත සීමාවක ඉන්නවා. අනවශ්‍ය විදුලි උපකරණ නිවා දමා හැමවිටම ඊළඟ ඉහළ Slab එකට (කාණ්ඩයට) යාම වළක්වා ගන්න.";
+        }
+
+        // Dark/Light Mode Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlElement = document.documentElement;
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        
+        if (currentTheme === 'light') { htmlElement.classList.add('light'); themeIcon.className = 'fa-solid fa-sun'; }
+        
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('light')) {
+                htmlElement.classList.remove('light');
+                themeIcon.className = 'fa-solid fa-moon';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlElement.classList.add('light');
+                themeIcon.className = 'fa-solid fa-sun';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>
