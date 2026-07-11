@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Stopwatch with Lap Timer</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts for Mono display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="bg-[#0a1224] text-slate-100 min-h-screen flex flex-col justify-center items-center p-4">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-2xl bg-[#111c35] border border-slate-800 rounded-2xl shadow-xl p-6 md:p-8">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-6">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h1 class="text-xl font-semibold tracking-tight">Online Stopwatch</h1>
+            </div>
+            <span id="status-badge" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs px-2.5 py-1 rounded-full font-medium">Paused</span>
+        </div>
+
+        <!-- Timer Display -->
+        <div class="bg-gradient-to-br from-blue-500/5 to-transparent border border-slate-800 rounded-2xl p-8 text-center mb-6">
+            <div id="display" class="font-mono text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white tabular-nums">
+                00:00:00.00
+            </div>
+            <p class="text-xs uppercase tracking-widest text-slate-400 mt-2">Elapsed Time</p>
+        </div>
+
+        <!-- Controls Buttons -->
+        <div class="flex flex-wrap justify-center gap-3 mb-6">
+            <button id="startPauseBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold h-12 px-6 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-blue-600/20 min-w-[120px] justify-center">
+                Start
+            </button>
+            <button id="lapBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium h-12 px-6 rounded-xl transition-all flex items-center gap-2 cursor-pointer min-w-[100px] justify-center">
+                Lap
+            </button>
+            <button id="resetBtn" class="bg-transparent hover:bg-slate-800 text-slate-400 hover:text-slate-200 font-medium h-12 px-6 rounded-xl transition-all flex items-center gap-2 cursor-pointer min-w-[100px] justify-center">
+                Reset
+            </button>
+        </div>
+
+        <!-- Keyboard Shortcuts Info -->
+        <div class="flex flex-wrap justify-center gap-4 border-t border-slate-800 pt-4 text-xs text-slate-400 mb-6">
+            <span class="flex items-center gap-1.5"><kbd class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">SPACE</kbd> Start / Pause</span>
+            <span class="flex items-center gap-1.5"><kbd class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">L</kbd> Lap</span>
+            <span class="flex items-center gap-1.5"><kbd class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">R</kbd> Reset</span>
+        </div>
+
+        <!-- Laps Section -->
+        <div>
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">Laps Log</h2>
+            <div id="lapsContainer" class="max-h-48 overflow-y-auto border border-slate-800 rounded-xl divide-y divide-slate-800 bg-slate-900/50">
+                <div id="noLapsRow" class="p-4 text-center text-sm text-slate-500 border-dashed border border-slate-800 rounded-xl">
+                    Press <span class="text-slate-300 font-medium">Start</span> and then <span class="text-slate-300 font-medium">Lap</span> to record split times.
+                </div>
+                <table id="lapsTable" class="w-full text-left font-mono text-sm hidden">
+                    <thead>
+                        <tr class="text-slate-400 text-xs uppercase bg-slate-900/80">
+                            <th class="p-3 pl-4">Lap</th>
+                            <th class="p-3">Lap Time</th>
+                            <th class="p-3 pr-4 text-right">Overall Split</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lapsList" class="divide-y divide-slate-800">
+                        <!-- Dynamic laps go here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Stopwatch Logic Script -->
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval = null;
+        let isRunning = false;
+        let laps = [];
+
+        const display = document.getElementById('display');
+        const startPauseBtn = document.getElementById('startPauseBtn');
+        const lapBtn = document.getElementById('lapBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const statusBadge = document.getElementById('status-badge');
+        const lapsContainer = document.getElementById('lapsContainer');
+        const lapsTable = document.getElementById('lapsTable');
+        const lapsList = document.getElementById('lapsList');
+        const noLapsRow = document.getElementById('noLapsRow');
+
+        function formatTime(ms) {
+            let hours = Math.floor(ms / 3600000);
+            let minutes = Math.floor((ms % 3600000) / 60000);
+            let seconds = Math.floor((ms % 60000) / 1000);
+            let centiseconds = Math.floor((ms % 1000) / 10);
+
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            const now = performance.now();
+            const currentElapsed = isRunning ? elapsedTime + (now - startTime) : elapsedTime;
+            display.textContent = formatTime(currentElapsed);
+        }
+
+        function startTimer() {
+            startTime = performance.now();
+            timerInterval = requestAnimationFrame(function run() {
+                if (isRunning) {
+                    updateDisplay();
+                    timerInterval = requestAnimationFrame(run);
+                }
+            });
+        }
+
+        function toggleStartPause() {
+            if (!isRunning) {
+                // Start / Resume
+                isRunning = true;
+                startTimer();
+                startPauseBtn.textContent = 'Pause';
+                startPauseBtn.classList.replace('bg-blue-600', 'bg-amber-600');
+                startPauseBtn.classList.replace('hover:bg-blue-500', 'hover:bg-amber-500');
+                statusBadge.textContent = 'Running';
+                statusBadge.classList.replace('text-blue-400', 'text-emerald-400');
+                statusBadge.classList.replace('bg-blue-500/10', 'bg-emerald-500/10');
+                statusBadge.classList.replace('border-blue-500/20', 'border-emerald-500/20');
+            } else {
+                // Pause
+                isRunning = false;
+                elapsedTime += performance.now() - startTime;
+                cancelAnimationFrame(timerInterval);
+                startPauseBtn.textContent = 'Resume';
+                startPauseBtn.classList.replace('bg-amber-600', 'bg-blue-600');
+                startPauseBtn.classList.replace('hover:bg-amber-500', 'hover:bg-blue-500');
+                statusBadge.textContent = 'Paused';
+                statusBadge.classList.replace('text-emerald-400', 'text-blue-400');
+                statusBadge.classList.replace('bg-emerald-500/10', 'bg-blue-500/10');
+                statusBadge.classList.replace('border-emerald-500/20', 'border-blue-500/20');
+            }
+        }
+
+        function recordLap() {
+            if (elapsedTime === 0 && !isRunning) return;
+
+            const now = performance.now();
+            const currentTotal = isRunning ? elapsedTime + (now - startTime) : elapsedTime;
+            
+            let priorSplit = laps.length > 0 ? laps[0].total : 0;
+            let lapDuration = currentTotal - priorSplit;
+
+            laps.unshift({
+                lapNum: laps.length + 1,
+                duration: lapDuration,
+                total: currentTotal
+            });
+
+            renderLaps();
+        }
+
+        function renderLaps() {
+            if (laps.length === 0) {
+                lapsTable.classList.add('hidden');
+                noLapsRow.classList.remove('hidden');
+                return;
+            }
+
+            lapsTable.classList.remove('hidden');
+            noLapsRow.classList.add('hidden');
+            lapsList.innerHTML = '';
+
+            laps.forEach(lap => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/30 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-3 pl-4 text-slate-400">#${lap.lapNum}</td>
+                    <td class="p-3 text-white font-medium">${formatTime(lap.duration)}</td>
+                    <td class="p-3 pr-4 text-right text-slate-400">${formatTime(lap.total)}</td>
+                `;
+                lapsList.appendChild(tr);
+            });
+        }
+
+        function resetTimer() {
+            isRunning = false;
+            cancelAnimationFrame(timerInterval);
+            startTime = 0;
+            elapsedTime = 0;
+            laps = [];
+            
+            display.textContent = '00:00:00.00';
+            startPauseBtn.textContent = 'Start';
+            startPauseBtn.className = startPauseBtn.className.replace(/bg-\w+-600/, 'bg-blue-600').replace(/hover:bg-\w+-500/, 'hover:bg-blue-500');
+            
+            statusBadge.textContent = 'Paused';
+            statusBadge.className = "bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs px-2.5 py-1 rounded-full font-medium";
+            
+            renderLaps();
+        }
+
+        // Event Listeners
+        startPauseBtn.addEventListener('click', toggleStartPause);
+        lapBtn.addEventListener('click', recordLap);
+        resetBtn.addEventListener('click', resetTimer);
+
+        // Keyboard Shortcuts
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleStartPause();
+            } else if (e.key.toLowerCase() === 'l') {
+                recordLap();
+            } else if (e.key.toLowerCase() === 'r') {
+                resetTimer();
+            }
+        });
+    </script>
+</body>
+</html>
