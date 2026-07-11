@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" class="body--dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi QR Code Generator - KDJ Tools</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QRCode.js Library for Client-Side Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #121212;
+            --inner-box: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex items-center justify-center min-height-screen">
+
+    <div class="max-w-4xl w-full mx-auto">
+        <!-- Back to Dashboard Button -->
+        <a href="index.html" class="inline-flex items-center gap-2 text-sm text-red-500 hover:underline mb-6 transition-all">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <!-- Header Hero Section -->
+        <div class="mb-8 p-6 rounded-2xl border border-red-500/10 bg-gradient-to-r from-red-950/20 to-transparent">
+            <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 text-xl mb-4 border border-red-500/20">
+                <i class="fa-solid fa-wifi"></i>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">WiFi QR Code Generator</h1>
+            <p class="text-sm text-[var(--text-muted)] max-w-xl">
+                Generate QR codes for WiFi networks. Scan to connect instantly on mobile devices. Processed entirely in your browser for 100% privacy.
+            </p>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Left Side: Input Form -->
+            <div class="p-6 rounded-2xl border border-[var(--border-color)]" style="background: var(--inner-box);">
+                <div class="space-y-4">
+                    <!-- SSID -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5" style="color: var(--text-main);">Network Name (SSID)</label>
+                        <input type="text" id="ssid" placeholder="e.g. MyWiFiNetwork" class="w-full bg-[#121212] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 transition-colors">
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5" style="color: var(--text-main);">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" placeholder="WiFi Password" class="w-full bg-[#121212] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 transition-colors pr-10">
+                            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white">
+                                <i id="eye-icon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Encryption Type -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5" style="color: var(--text-main);">Encryption</label>
+                        <select id="encryption" class="w-full bg-[#121212] border border-[var(--border-color)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 transition-colors appearance-none cursor-pointer">
+                            <option value="WPA" selected>WPA/WPA2/WPA3</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">Unsecured (No Password)</option>
+                        </select>
+                    </div>
+
+                    <!-- Hidden Network Toggle -->
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#121212] border border-[var(--border-color)]">
+                        <span class="text-sm">Hidden Network</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="hidden" class="sr-only peer">
+                            <div class="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3 pt-2">
+                        <button onclick="generateWiFiQR()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium text-sm py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-red-950/20">
+                            <i class="fa-solid fa-qrcode"></i> Generate QR
+                        </button>
+                        <button onclick="clearFields()" class="px-4 py-3 rounded-xl border border-[var(--border-color)] text-sm font-medium hover:bg-zinc-800 transition-colors">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: QR Display & Download -->
+            <div class="p-6 rounded-2xl border border-[var(--border-color)] flex flex-col items-center justify-center text-center relative" style="background: var(--inner-box);">
+                <div id="qr-placeholder" class="space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-zinc-800/5 flex items-center justify-center mx-auto text-zinc-600 border border-zinc-800/50">
+                        <i class="fa-solid fa-qrcode text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-[var(--text-muted)]">Fill in the details and click <br><strong class="text-red-500">Generate QR</strong></p>
+                </div>
+
+                <!-- Generated QR Area (Hidden by default) -->
+                <div id="qr-result-container" class="hidden w-full flex flex-col items-center space-y-5">
+                    <div class="p-4 bg-white rounded-2xl shadow-xl inline-block">
+                        <div id="qrcode"></div>
+                    </div>
+                    <p class="text-xs text-[var(--text-muted)]"><i class="fa-solid fa-circle-info text-red-500 mr-1"></i> Scan with your mobile camera to auto-connect</p>
+                    
+                    <button onclick="downloadQR()" class="w-full max-w-xs bg-zinc-800 hover:bg-zinc-700 text-white border border-[var(--border-color)] font-medium text-sm py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download"></i> Download Image
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript Functions -->
+    <script>
+        let qrcodeElement = document.getElementById("qrcode");
+        let qrCodeInstance = null;
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById("password");
+            const eyeIcon = document.getElementById("eye-icon");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+            }
+        }
+
+        function generateWiFiQR() {
+            const ssid = document.getElementById("ssid").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const encryption = document.getElementById("encryption").value;
+            const isHidden = document.getElementById("hidden").checked;
+
+            if (!ssid) {
+                alert("Please enter your Network Name (SSID)!");
+                return;
+            }
+
+            // Standard WiFi QR format: WIFI:S:SSID;T:WPA;P:PASSWORD;H:true;;
+            let qrString = `WIFI:S:${ssid};T:${encryption};`;
+            if (encryption !== "nopass") {
+                qrString += `P:${password};`;
+            }
+            if (isHidden) {
+                qrString += `H:true;`;
+            }
+            qrString += ";";
+
+            // Clear old contents
+            qrcodeElement.innerHTML = "";
+            
+            // UI Toggle
+            document.getElementById("qr-placeholder").classList.add("hidden");
+            document.getElementById("qr-result-container").classList.remove("hidden");
+
+            // Generate New QR
+            qrCodeInstance = new QRCode(qrcodeElement, {
+                text: qrString,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function clearFields() {
+            document.getElementById("ssid").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("encryption").value = "WPA";
+            document.getElementById("hidden").checked = false;
+            
+            document.getElementById("qr-placeholder").classList.remove("hidden");
+            document.getElementById("qr-result-container").classList.add("hidden");
+            qrcodeElement.innerHTML = "";
+        }
+
+        function downloadQR() {
+            const img = qrcodeElement.querySelector("img");
+            if (!img) return;
+
+            const link = document.createElement("a");
+            link.href = img.src;
+            link.download = `${document.getElementById("ssid").value || 'wifi'}-qr-code.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
