@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Lanka NIC Decoder & Converter | Portfolio</title>
+    
+    <!-- Tailwind CSS & FontAwesome Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0a192f;
+            --text-main: #ffffff;
+            --text-sub: #e2e8f0;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --grid-color: rgba(16, 185, 129, 0.05);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-sub);
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+        }
+    </style>
+</head>
+<body class="min-h-screen py-12 px-4 md:px-8 bg-[radial-gradient(circle_at_2px_2px,var(--grid-color)_1px,transparent_0)] bg-[size:30px_30px]">
+
+    <div class="max-w-xl mx-auto container">
+        
+        <!-- Navigation -->
+        <div class="flex justify-between items-center mb-8">
+            <a href="index.html" class="glass-card px-4 py-2 rounded-xl text-sm font-semibold hover:text-emerald-400 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Back to Portfolio
+            </a>
+        </div>
+
+        <!-- Header -->
+        <div class="glass-card rounded-3xl p-6 text-center mb-6 border border-emerald-500/20">
+            <div class="inline-flex p-3 rounded-2xl bg-emerald-500/10 text-emerald-400 text-2xl mb-3">
+                <i class="fa-solid fa-id-card"></i>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-white">
+                Sri Lanka NIC Decoder
+            </h1>
+            <p class="text-xs tracking-wide text-emerald-400 uppercase mono">
+                // Convert old NIC to new format & extract insights
+            </p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="glass-card rounded-2xl p-6 space-y-4 mb-6">
+            <div>
+                <label for="nicInput" class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">// Enter NIC Number</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-emerald-500/60">
+                        <i class="fa-solid fa-fingerprint"></i>
+                    </div>
+                    <input type="text" id="nicInput" autocomplete="off" placeholder="e.g., 982071234V or 199820701234" 
+                        class="w-full pl-11 pr-4 py-3.5 bg-slate-900/50 border border-emerald-500/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono tracking-wide text-lg" />
+                </div>
+                <p id="errorMessage" class="text-rose-400 text-xs mt-2 hidden flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i> Invalid Sri Lankan NIC format.
+                </p>
+            </div>
+        </div>
+
+        <!-- Results Wrapper (Hidden by default) -->
+        <div id="resultSection" class="hidden opacity-0 transition-all duration-300 transform translate-y-2 space-y-4">
+            
+            <!-- Format Conversion Badge -->
+            <div class="glass-card border-emerald-500/20 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-emerald-500/5">
+                <div>
+                    <span class="text-xs text-emerald-400 font-medium block">Converted Format</span>
+                    <span id="convertedNic" class="text-xl font-bold font-mono text-white tracking-wider">-</span>
+                </div>
+                <span id="nicFormatType" class="text-[10px] uppercase font-bold tracking-widest bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-md border border-emerald-500/30">
+                    NEW FORMAT
+                </span>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Birthday -->
+                <div class="glass-card rounded-xl p-4 flex items-center gap-4 bg-slate-900/40">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/10">
+                        <i class="fa-solid fa-cake-candles"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 font-medium block">Date of Birth</span>
+                        <span id="birthDate" class="text-sm font-semibold text-white">-</span>
+                    </div>
+                </div>
+
+                <!-- Gender -->
+                <div class="glass-card rounded-xl p-4 flex items-center gap-4 bg-slate-900/40">
+                    <div id="genderIconContainer" class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/10">
+                        <i id="genderIcon" class="fa-solid fa-venus-mars"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 font-medium block">Gender</span>
+                        <span id="gender" class="text-sm font-semibold text-white">-</span>
+                    </div>
+                </div>
+
+                <!-- Age -->
+                <div class="glass-card rounded-xl p-4 flex items-center gap-4 bg-slate-900/40">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/10">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 font-medium block">Current Age</span>
+                        <span id="age" class="text-sm font-semibold text-white">-</span>
+                    </div>
+                </div>
+
+                <!-- Day of Year -->
+                <div class="glass-card rounded-xl p-4 flex items-center gap-4 bg-slate-900/40">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/10">
+                        <i class="fa-solid fa-calendar-day"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 font-medium block">Day of the Year</span>
+                        <span id="dayOfYear" class="text-sm font-semibold text-white">-</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Placeholder when no data entered -->
+        <div id="placeholderSection" class="border border-dashed border-emerald-500/20 rounded-xl p-8 text-center text-slate-500 class-card">
+            <i class="fa-solid fa-chart-pie text-2xl mb-2 block text-emerald-500/40"></i>
+            <span class="text-xs font-medium uppercase tracking-wider mono">// Results will appear here in real-time</span>
+        </div>
+
+    </div>
+
+    <!-- Core NIC Processing JavaScript Logic -->
+    <script>
+        const nicInput = document.getElementById('nicInput');
+        const resultSection = document.getElementById('resultSection');
+        const placeholderSection = document.getElementById('placeholderSection');
+        const errorMessage = document.getElementById('errorMessage');
+
+        const convertedNic = document.getElementById('convertedNic');
+        const nicFormatType = document.getElementById('nicFormatType');
+        const birthDate = document.getElementById('birthDate');
+        const gender = document.getElementById('gender');
+        const genderIcon = document.getElementById('genderIcon');
+        const genderIconContainer = document.getElementById('genderIconContainer');
+        const age = document.getElementById('age');
+        const dayOfYear = document.getElementById('dayOfYear');
+
+        const monthData = [
+            { month: 'January', days: 31 }, { month: 'February', days: 29 },
+            { month: 'March', days: 31 }, { month: 'April', days: 30 },
+            { month: 'May', days: 31 }, { month: 'June', days: 30 },
+            { month: 'July', days: 31 }, { month: 'August', days: 31 },
+            { month: 'September', days: 30 }, { month: 'October', days: 31 },
+            { month: 'November', days: 30 }, { month: 'December', days: 31 }
+        ];
+
+        nicInput.addEventListener('input', (e) => {
+            let value = e.target.value.trim().toUpperCase();
+            if (value === "") {
+                resetUI();
+                return;
+            }
+
+            let parsedData = validateAndParseNIC(value);
+
+            if (parsedData) {
+                errorMessage.classList.add('hidden');
+                nicInput.classList.remove('border-rose-500', 'focus:border-rose-500', 'focus:ring-rose-500');
+                showResults(parsedData);
+            } else {
+                errorMessage.classList.remove('hidden');
+                nicInput.classList.add('border-rose-500', 'focus:border-rose-500', 'focus:ring-rose-500');
+                resultSection.classList.add('hidden');
+                placeholderSection.classList.remove('hidden');
+            }
+        });
+
+        function validateAndParseNIC(nic) {
+            let year, days, sequence, isOldFormat;
+            
+            const oldNicPattern = /^([0-9]{2})([0-9]{3})([0-9]{3})([VXvx])$/;
+            const newNicPattern = /^([0-9]{4})([0-9]{3})([0-9]{5})$/;
+
+            if (oldNicPattern.test(nic)) {
+                const match = nic.match(oldNicPattern);
+                year = parseInt("19" + match[1]);
+                days = parseInt(match[2]);
+                sequence = match[3];
+                isOldFormat = true;
+            } else if (newNicPattern.test(nic)) {
+                const match = nic.match(newNicPattern);
+                year = parseInt(match[1]);
+                days = parseInt(match[2]);
+                sequence = match[3];
+                isOldFormat = false;
+            } else {
+                return null;
+            }
+
+            let isFemale = false;
+            let actualDays = days;
+            if (days > 500) {
+                isFemale = true;
+                actualDays = days - 500;
+            }
+
+            if (actualDays < 1 || actualDays > 366) return null;
+
+            let dateDetails = getBirthMonthAndDate(actualDays);
+            if (!dateDetails) return null;
+
+            let displayConvertedNic = "";
+            let currentTypeLabel = "";
+            if (isOldFormat) {
+                displayConvertedNic = `19${nic.substring(0,2)}${nic.substring(2,5)}0${nic.substring(5,8)}`;
+                currentTypeLabel = "Old Format Input";
+            } else {
+                displayConvertedNic = `${nic.substring(0,4)} ${nic.substring(4,7)} ${nic.substring(7,12)}`;
+                currentTypeLabel = "New Format Input";
+            }
+
+            const currentYear = new Date().getFullYear();
+            let estimatedAge = currentYear - year;
+
+            return {
+                converted: displayConvertedNic,
+                typeLabel: currentTypeLabel,
+                birthDateStr: `${dateDetails.day} ${dateDetails.month} ${year}`,
+                genderStr: isFemale ? "Female" : "Male",
+                ageStr: `${estimatedAge} Years Old`,
+                dayOfYearStr: `${actualDays}`
+            };
+        }
+
+        function getBirthMonthAndDate(days) {
+            let dayCounter = days;
+            for (let i = 0; i < monthData.length; i++) {
+                if (dayCounter <= monthData[i].days) {
+                    return {
+                        month: monthData[i].month,
+                        day: dayCounter
+                    };
+                }
+                dayCounter -= monthData[i].days;
+            }
+            return null;
+        }
+
+        function showResults(data) {
+            convertedNic.textContent = data.converted;
+            nicFormatType.textContent = data.typeLabel;
+            birthDate.textContent = data.birthDateStr;
+            gender.textContent = data.genderStr;
+            age.textContent = data.ageStr;
+            dayOfYear.textContent = data.dayOfYearStr;
+
+            if (data.genderStr === "Female") {
+                genderIcon.className = "fa-solid fa-venus text-lg";
+                genderIconContainer.className = "w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/10";
+            } else {
+                genderIcon.className = "fa-solid fa-mars text-lg";
+                genderIconContainer.className = "w-10 h-10 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/10";
+            }
+
+            placeholderSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            setTimeout(() => {
+                resultSection.classList.remove('opacity-0', 'translate-y-2');
+            }, 50);
+        }
+
+        function resetUI() {
+            errorMessage.classList.add('hidden');
+            nicInput.classList.remove('border-rose-500', 'focus:border-rose-500', 'focus:ring-rose-500');
+            resultSection.classList.add('hidden');
+            resultSection.classList.add('opacity-0', 'translate-y-2');
+            placeholderSection.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
