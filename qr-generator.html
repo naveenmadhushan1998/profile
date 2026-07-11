@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { background-color: #121214; color: #e2e8f0; }
+    </style>
+</head>
+<body class="font-sans antialiased p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Back Button & Title -->
+        <div class="flex items-center space-x-4 mb-8">
+            <a href="index.html" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-300 transition">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-white">QR Code Generator</h1>
+                <p class="text-xs text-gray-400">Back to Home</p>
+            </div>
+        </div>
+        
+        <!-- Tool Interface Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Input & Customization -->
+            <div class="md:col-span-2 space-y-6">
+                <div class="bg-[#1a1a1e] border border-gray-800 rounded-2xl p-6 shadow-md">
+                    <h3 class="text-base font-semibold text-white mb-4 flex items-center">
+                        <i class="fa-solid fa-keyboard text-red-500 mr-2 text-sm"></i>QR Code Content
+                    </h3>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider">Text or URL Content</label>
+                        <textarea id="qr-text" rows="4" class="w-full bg-[#121214] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition resize-none" placeholder="Enter your text or website link here..."></textarea>
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-gray-300 mt-6 mb-3 border-t border-gray-800 pt-4">Customization</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs text-gray-400">QR Code Size</label>
+                            <select id="qr-size" class="w-full bg-[#121214] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500">
+                                <option value="128">128 x 128</option>
+                                <option value="256" selected>256 x 256</option>
+                                <option value="384">384 x 384</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs text-gray-400">Foreground Color</label>
+                            <div class="flex bg-[#121214] border border-gray-700 rounded-lg p-1.5 items-center">
+                                <input type="color" id="qr-color-fg" value="#000000" class="w-8 h-6 bg-transparent border-0 cursor-pointer rounded">
+                                <span class="text-xs text-gray-400 ml-2">Main Color</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 mt-6 pt-4 border-t border-gray-800">
+                        <button id="btn-clear" class="flex-1 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-trash-can text-xs"></i> Clear
+                        </button>
+                        <button id="btn-generate" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-red-900/20">
+                            <i class="fa-solid fa-gear text-xs"></i> Generate
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Display -->
+            <div class="md:col-span-1">
+                <div class="bg-[#1a1a1e] border border-gray-800 rounded-2xl p-6 shadow-md text-center h-full flex flex-col justify-between min-h-[340px]">
+                    <div>
+                        <h3 class="text-base font-semibold text-white mb-6 flex items-center justify-center md:justify-start">
+                            <i class="fa-solid fa-display text-red-500 mr-2 text-sm"></i>Result
+                        </h3>
+                        
+                        <div class="bg-[#121214] border border-dashed border-gray-700 rounded-xl p-6 min-h-[180px] flex items-center justify-center mx-auto max-w-[200px]">
+                            <div id="qrcode-container" class="hidden p-2 bg-white rounded-lg"></div>
+                            <div id="qr-placeholder" class="text-gray-500 text-xs space-y-2">
+                                <i class="fa-solid fa-qrcode text-4xl text-gray-700 block"></i>
+                                <span>Preview Area</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button id="btn-download" disabled class="w-full py-2.5 bg-gray-800 text-gray-500 text-sm font-medium rounded-xl flex items-center justify-center gap-2 cursor-not-allowed transition">
+                            <i class="fa-solid fa-download text-xs"></i> Download QR
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        const qrText = document.getElementById('qr-text');
+        const qrSize = document.getElementById('qr-size');
+        const colorFg = document.getElementById('qr-color-fg');
+        const btnGenerate = document.getElementById('btn-generate');
+        const btnClear = document.getElementById('btn-clear');
+        const btnDownload = document.getElementById('btn-download');
+        const qrContainer = document.getElementById('qrcode-container');
+        const qrPlaceholder = document.getElementById('qr-placeholder');
+
+        btnGenerate.addEventListener('click', () => {
+            const textValue = qrText.value.trim();
+            if (!textValue) return alert('Please enter some text or a URL!');
+
+            qrContainer.innerHTML = '';
+            qrPlaceholder.classList.add('hidden');
+            qrContainer.classList.remove('hidden');
+
+            const size = parseInt(qrSize.value);
+
+            new QRCode(qrContainer, {
+                text: textValue,
+                width: size,
+                height: size,
+                colorDark: colorFg.value,
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            setTimeout(() => {
+                const img = qrContainer.querySelector('img');
+                if(img) {
+                    btnDownload.removeAttribute('disabled');
+                    btnDownload.classList.remove('bg-gray-800', 'text-gray-500', 'cursor-not-allowed');
+                    btnDownload.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'text-white');
+                }
+            }, 100);
+        });
+
+        btnClear.addEventListener('click', () => {
+            qrText.value = '';
+            qrContainer.innerHTML = '';
+            qrContainer.classList.add('hidden');
+            qrPlaceholder.classList.remove('hidden');
+            btnDownload.setAttribute('disabled', 'true');
+            btnDownload.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'text-white');
+            btnDownload.classList.add('bg-gray-800', 'text-gray-500', 'cursor-not-allowed');
+        });
+
+        btnDownload.addEventListener('click', () => {
+            const img = qrContainer.querySelector('img');
+            if (img) {
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = 'qrcode.png';
+                link.click();
+            }
+        });
+    </script>
+</body>
+</html>
