@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Compressor | Naveen Siriwardhana</title>
+
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖼️</text></svg>">
+
+    <style>
+        :root {
+            --bg-color: #0a192f;
+            --text-main: #ffffff;
+            --text-sub: #e2e8f0;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --inner-box: rgba(255, 255, 255, 0.05);
+            --grid-color: rgba(16, 185, 129, 0.05);
+            --input-bg: rgba(10, 25, 47, 0.7);
+        }
+
+        html.light {
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(15, 23, 42, 0.08);
+            --inner-box: rgba(15, 23, 42, 0.04);
+            --grid-color: rgba(16, 185, 129, 0.08);
+            --input-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-sub);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+        }
+
+        .grid-bg {
+            background-image: radial-gradient(circle at 2px 2px, var(--grid-color) 1px, transparent 0);
+            background-size: 30px 30px;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.15);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            border: 3px solid #0a192f;
+        }
+
+        #drop-zone.drag-over {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.05);
+        }
+    </style>
+</head>
+<body class="grid-bg min-h-screen py-12 px-4 md:px-8">
+
+    <div class="max-w-2xl mx-auto container">
+
+        <!-- Navigation & Theme Toggle -->
+        <div class="flex justify-between items-center mb-8">
+            <a href="index.html" class="glass-card px-4 py-2 rounded-xl text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Back to Profile
+            </a>
+            <button id="theme-toggle" class="glass-card p-3 rounded-xl text-emerald-400 hover:text-emerald-300 focus:outline-none cursor-pointer">
+                <i id="theme-icon" class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+
+        <!-- Tool Card -->
+        <div class="glass-card rounded-3xl p-6 md:p-8 shadow-xl">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl text-emerald-400"><i class="fa-solid fa-file-zipper"></i></span>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight" style="color: var(--text-main);">Image Compressor</h1>
+                    <p class="text-xs mono uppercase tracking-wider text-emerald-400">// Resize & Compress, 100% Client-Side</p>
+                </div>
+            </div>
+
+            <hr class="border-emerald-500/10 mb-6">
+
+            <!-- Drop Zone -->
+            <div id="drop-zone" class="border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all mb-6" style="border-color: var(--card-border);">
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-400 mb-2 block"></i>
+                <p class="text-sm font-semibold" style="color: var(--text-main);">Click or Drag an Image Here</p>
+                <p class="text-xs mt-1" style="color: var(--text-muted);">JPG, PNG, WEBP supported</p>
+            </div>
+
+            <!-- Controls (hidden until image loaded) -->
+            <div id="controls" class="hidden space-y-5 mb-6">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold" style="color: var(--text-main);">Quality</label>
+                        <span id="quality-label" class="text-sm font-bold text-emerald-400 mono">80%</span>
+                    </div>
+                    <input type="range" id="quality-slider" min="10" max="100" step="5" value="80" class="w-full">
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold" style="color: var(--text-main);">Max Width (px)</label>
+                        <span id="width-label" class="text-sm font-bold text-emerald-400 mono">1920</span>
+                    </div>
+                    <input type="range" id="width-slider" min="200" max="4000" step="10" value="1920" class="w-full">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2" style="color: var(--text-main);">Output Format</label>
+                    <select id="format-select" class="w-full p-3 rounded-xl border border-emerald-500/20 focus:border-emerald-400 focus:outline-none font-semibold cursor-pointer" style="background: var(--input-bg); color: var(--text-main);">
+                        <option value="image/jpeg">JPEG</option>
+                        <option value="image/webp">WebP</option>
+                        <option value="image/png">PNG</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Preview & Result -->
+            <div id="result-section" class="hidden space-y-4">
+                <div class="rounded-2xl overflow-hidden border border-emerald-500/20 bg-black/20">
+                    <img id="preview-img" class="w-full h-auto max-h-80 object-contain mx-auto" alt="Preview">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-4 rounded-xl text-center" style="background: var(--inner-box);">
+                        <p class="text-[11px] uppercase tracking-wider font-semibold text-slate-400 mb-1">Original Size</p>
+                        <p id="out-original-size" class="font-bold mono text-sm" style="color: var(--text-main);">-</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" style="background: var(--inner-box);">
+                        <p class="text-[11px] uppercase tracking-wider font-semibold text-emerald-400 mb-1">Compressed Size</p>
+                        <p id="out-new-size" class="font-bold mono text-sm text-emerald-400">-</p>
+                    </div>
+                </div>
+
+                <p id="savings-note" class="text-center text-sm font-semibold text-emerald-400"></p>
+
+                <a id="download-btn" href="#" download="compressed-image.jpg" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10">
+                    <i class="fa-solid fa-download"></i> Download Compressed Image
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const controls = document.getElementById('controls');
+        const resultSection = document.getElementById('result-section');
+        const qualitySlider = document.getElementById('quality-slider');
+        const qualityLabel = document.getElementById('quality-label');
+        const widthSlider = document.getElementById('width-slider');
+        const widthLabel = document.getElementById('width-label');
+        const formatSelect = document.getElementById('format-select');
+        const previewImg = document.getElementById('preview-img');
+        const outOriginalSize = document.getElementById('out-original-size');
+        const outNewSize = document.getElementById('out-new-size');
+        const savingsNote = document.getElementById('savings-note');
+        const downloadBtn = document.getElementById('download-btn');
+
+        let originalImage = null;
+        let originalFileSize = 0;
+        let originalFileName = 'image';
+
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function loadFile(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+            originalFileSize = file.size;
+            originalFileName = file.name.replace(/\.[^/.]+$/, "");
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    controls.classList.remove('hidden');
+                    resultSection.classList.remove('hidden');
+                    outOriginalSize.textContent = formatBytes(originalFileSize);
+                    processImage();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function processImage() {
+            if (!originalImage) return;
+
+            const maxWidth = parseInt(widthSlider.value);
+            const quality = parseInt(qualitySlider.value) / 100;
+            const format = formatSelect.value;
+
+            let { width, height } = originalImage;
+            if (width > maxWidth) {
+                height = Math.round(height * (maxWidth / width));
+                width = maxWidth;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(originalImage, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                const url = URL.createObjectURL(blob);
+                previewImg.src = url;
+                outNewSize.textContent = formatBytes(blob.size);
+
+                const savings = originalFileSize > 0 ? ((1 - blob.size / originalFileSize) * 100) : 0;
+                if (savings > 0) {
+                    savingsNote.textContent = `🎉 ${savings.toFixed(0)}% smaller than the original file!`;
+                } else {
+                    savingsNote.textContent = `New file is ${Math.abs(savings).toFixed(0)}% larger (try lowering quality).`;
+                }
+
+                const ext = format === 'image/png' ? 'png' : (format === 'image/webp' ? 'webp' : 'jpg');
+                downloadBtn.href = url;
+                downloadBtn.download = `${originalFileName}-compressed.${ext}`;
+            }, format, quality);
+        }
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
+
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            loadFile(e.dataTransfer.files[0]);
+        });
+
+        qualitySlider.addEventListener('input', () => {
+            qualityLabel.textContent = qualitySlider.value + '%';
+            processImage();
+        });
+        widthSlider.addEventListener('input', () => {
+            widthLabel.textContent = widthSlider.value;
+            processImage();
+        });
+        formatSelect.addEventListener('change', processImage);
+
+        // Theme Toggle Setup
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlElement = document.documentElement;
+
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        if (currentTheme === 'light') {
+            htmlElement.classList.add('light');
+            themeIcon.className = 'fa-solid fa-sun';
+        } else {
+            htmlElement.classList.remove('light');
+            themeIcon.className = 'fa-solid fa-moon';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('light')) {
+                htmlElement.classList.remove('light');
+                themeIcon.className = 'fa-solid fa-moon';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlElement.classList.add('light');
+                themeIcon.className = 'fa-solid fa-sun';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>
