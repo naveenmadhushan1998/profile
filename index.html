@@ -1,10 +1,28 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Naveen Siriwardhana | Senior System & Infrastructure Engineer</title>
     
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Official portfolio and interactive lab of Naveen Siriwardhana, Senior System & Infrastructure Engineer. Explorer of cloud, network architectures, and custom utility tools.">
+    <meta name="keywords" content="Naveen Siriwardhana, Systems Engineer, Infrastructure Engineer, SLIIT Graduate, Crystal Martin Galagedara, Sri Lanka IT Professional, Network Calculator, APIT Tax Calculator">
+    <meta name="author" content="Naveen Siriwardhana">
+
+    <!-- Open Graph / Social Share Preview Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Naveen Siriwardhana | Senior System & Infrastructure Engineer">
+    <meta property="og:description" content="Portfolio and interactive lab of free utility tools — tax, CEB bill, NIC decoder, EMI, subnet calculator, and more.">
+    <meta property="og:image" content="https://YOUR-USERNAME.github.io/profile.jpg">
+    <meta property="og:url" content="https://YOUR-USERNAME.github.io/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Naveen Siriwardhana | Senior System & Infrastructure Engineer">
+    <meta name="twitter:description" content="Portfolio and interactive lab of free utility tools — tax, CEB bill, NIC decoder, EMI, subnet calculator, and more.">
+    <meta name="twitter:image" content="https://YOUR-USERNAME.github.io/profile.jpg">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
     <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -112,7 +130,8 @@
             <!-- Profile Image -->
             <div class="relative inline-block mb-6">
                 <img src="profile.jpg" alt="Naveen Siriwardhana" class="w-32 h-32 rounded-full object-cover border-2 border-emerald-500/40 p-1 mx-auto" onerror="this.src='https://via.placeholder.com/150'">
-                <span class="absolute bottom-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-current rounded-full text-slate-900 dark:text-[#0a192f]"></span>
+                <!-- Code Optimization: Tailwind Active Indicator Border Fixed for both themes -->
+                <span class="absolute bottom-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-slate-50 dark:border-[#0a192f] rounded-full"></span>
             </div>
 
             <!-- Name & Title -->
@@ -172,7 +191,8 @@
                 </div>
             </div>
         </div>
-		<!-- Downloads & CV Section -->
+        
+        <!-- Downloads & CV Section -->
         <div class="glass-card rounded-3xl p-8 mt-6">
             <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-6 font-bold flex items-center gap-2">
                 <span class="text-emerald-500">//</span> Professional Assets
@@ -190,9 +210,9 @@
                     </div>
                     <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-up-right-from-square text-sm"></i></span>
                 </a>
-
             </div>
         </div>
+
         <!-- Interactive Tools Section (Interactive Lab) -->
         <div class="glass-card rounded-3xl p-8 mt-6">
             <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-6 font-bold flex items-center gap-2">
@@ -211,29 +231,31 @@
                     </div>
                     <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
                 </a>
-				
-				<!-- Tool: QR Code Generator Card -->
-				<a href="qr-generator.html" class="flex items-center justify-between p-4 rounded-xl border border-red-500/5 hover:border-red-500/30 transition-all group" style="background: var(--inner-box);">
-					<div class="flex items-start gap-4">
-						<span class="text-2xl text-red-500 mt-0.5"><i class="fa-solid fa-qrcode"></i></span>
-						<div>
-							<p class="font-semibold group-hover:text-red-500 transition-colors" style="color: var(--text-main);">QR Code Generator</p>
-							<p class="text-sm" style="color: var(--text-muted);">Generate high-quality custom QR codes for URLs or text with instant browser-based downloading.</p>
-						</div>
-					</div>
-					<span class="group-hover:text-red-500 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
-				</a>
-				<!-- Tool: WiFi QR Code Generator Card -->
-				<a href="wifi-qr-generator.html" class="flex items-center justify-between p-4 rounded-xl border border-red-500/5 hover:border-red-500/30 transition-all group" style="background: var(--inner-box);">
-					<div class="flex items-start gap-4">
-						<span class="text-2xl text-red-500 mt-0.5"><i class="fa-solid fa-wifi"></i></span>
-						<div>
-							<p class="font-semibold group-hover:text-red-500 transition-colors" style="color: var(--text-main);">WiFi QR Code Generator</p>
-							<p class="text-sm" style="color: var(--text-muted);">Generate QR codes for WiFi networks so anyone can scan to connect instantly without typing passwords.</p>
-						</div>
-					</div>
-					<span class="group-hover:text-red-500 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
-				</a>
+                
+                <!-- Tool: QR Code Generator Card -->
+                <a href="qr-generator.html" class="flex items-center justify-between p-4 rounded-xl border border-red-500/5 hover:border-red-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-red-500 mt-0.5"><i class="fa-solid fa-qrcode"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-red-500 transition-colors" style="color: var(--text-main);">QR Code Generator</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Generate high-quality custom QR codes for URLs or text with instant browser-based downloading.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-red-500 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool: WiFi QR Code Generator Card -->
+                <a href="wifi-qr-generator.html" class="flex items-center justify-between p-4 rounded-xl border border-red-500/5 hover:border-red-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-red-500 mt-0.5"><i class="fa-solid fa-wifi"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-red-500 transition-colors" style="color: var(--text-main);">WiFi QR Code Generator</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Generate QR codes for WiFi networks so anyone can scan to connect instantly without typing passwords.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-red-500 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
                 <!-- Tool 2: Salary Tax Calculator -->
                 <a href="tax-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
                     <div class="flex items-start gap-4">
@@ -270,68 +292,141 @@
                     <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
                 </a>
 
-		<!-- Tool 5: CEB Electricity Bill Calculator -->
-<a href="ceb-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
-    <div class="flex items-start gap-4">
-        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-bolt"></i></span>
-        <div>
-            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">CEB Electricity Bill Calculator (විදුලි බිල් පාලකය)</p>
-            <p class="text-sm" style="color: var(--text-muted);">Calculate your domestic electricity bill according to CEB slabs and get smart energy-saving recommendations.</p>
-        </div>
-    </div>
-    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
-		</a>
-				<!-- Tool 8: Sinhala Style Age & Birthday Calculator -->
-				<a href="age-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
-						<div class="flex items-start gap-4">
-						<span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-cake-candles"></i></span>
-							<div>
-					<p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Age & Birthday Calculator</p>
-					<p class="text-sm" style="color: var(--text-muted);">Calculates exact age down to the day and shows a customized countdown to your next birthday.</p>
-						</div>
-						</div>
-				<span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
-			</a>
-			<!-- Tool 14: BMI & Fitness Calculator -->
-			<a href="bmi-fitness-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
-				<div class="flex items-start gap-4">
-				  <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-heart-pulse"></i></span>
-					<div>
-					   <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">BMI & Fitness Calculator</p>
-					   <p class="text-sm" style="color: var(--text-muted);">Quickly analyze body mass index, estimate maintenance calories, and receive customized health insights in Sinhala.</p>
-				  </div>
-			 </div>
-			<span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
-			</a>
-			<!-- NIC Decoder Card -->
-				<!-- Tool 15: Sri Lanka NIC Decoder -->
-			<a href="nic.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
-				<div class="flex items-start gap-4">
-					<span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-id-card"></i></span>
-					<div>
-						<p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Sri Lanka NIC Decoder</p>
-						<p class="text-sm" style="color: var(--text-muted);">Convert old NIC numbers to the new 12-digit format and instantly extract birthdate, exact age, and gender details.</p>
-					</div>
-				</div>
-				<span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
-			</a>
-			<!-- Tool 16: Online Stopwatch -->
-			<a href="stopwatch.html" class="flex items-center justify-between p-4 rounded-xl border border-blue-500/5 hover:border-blue-500/30 transition-all group" style="background: var(--inner-box);">
-				<div class="flex items-start gap-4">
-					<span class="text-2xl text-blue-400 mt-0.5"><i class="fa-solid fa-stopwatch"></i></span>
-					<div>
-						<p class="font-semibold group-hover:text-blue-400 transition-colors" style="color: var(--text-main);">Online Stopwatch</p>
-						<p class="text-sm" style="color: var(--text-muted);">Track elapsed time with precision, record lap splits, and use custom keyboard shortcuts for quick control.</p>
-					</div>
-				</div>
-				<span class="group-hover:text-blue-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
-			</a>
+                <!-- Tool 5: CEB Electricity Bill Calculator -->
+                <a href="ceb-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-bolt"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">CEB Electricity Bill Calculator (විදුලි බිල් පාලකය)</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Calculate your domestic electricity bill according to CEB slabs and get smart energy-saving recommendations.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 8: Sinhala Style Age & Birthday Calculator -->
+                <a href="age-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-cake-candles"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Age & Birthday Calculator</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Calculates exact age down to the day and shows a customized countdown to your next birthday.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 14: BMI & Fitness Calculator -->
+                <a href="bmi-fitness-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-heart-pulse"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">BMI & Fitness Calculator</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Quickly analyze body mass index, estimate maintenance calories, and receive customized health insights in Sinhala.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 15: Sri Lanka NIC Decoder -->
+                <a href="nic.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-id-card"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Sri Lanka NIC Decoder</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Convert old NIC numbers to the new 12-digit format and instantly extract birthdate, exact age, and gender details.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 16: Online Stopwatch -->
+                <a href="stopwatch.html" class="flex items-center justify-between p-4 rounded-xl border border-blue-500/5 hover:border-blue-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-blue-400 mt-0.5"><i class="fa-solid fa-stopwatch"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-blue-400 transition-colors" style="color: var(--text-main);">Online Stopwatch</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Track elapsed time with precision, record lap splits, and use custom keyboard shortcuts for quick control.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-blue-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 17: Loan / EMI Calculator -->
+                <a href="loan-emi-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Loan / EMI Calculator</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Calculate monthly installments for housing, vehicle, or personal loans with a full interest breakdown.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 18: Unit Converter -->
+                <a href="unit-converter.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Unit Converter</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Convert between length, weight, data, and currency units instantly in one place.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 19: Password Generator -->
+                <a href="password-generator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-key"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Password Generator</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Generate strong, secure passwords with a live strength meter, fully client-side.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 20: Subnet Calculator -->
+                <a href="subnet-calculator.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-network-wired"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">IPv4 Subnet Calculator</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Calculate network address, broadcast, subnet mask, and usable host range from CIDR notation.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 21: Image Compressor -->
+                <a href="image-compressor.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-file-zipper"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Image Compressor</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Resize and compress images right in your browser — nothing is uploaded anywhere.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
+
+                <!-- Tool 22: Countdown Timer -->
+                <a href="countdown-timer.html" class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/5 hover:border-emerald-500/30 transition-all group" style="background: var(--inner-box);">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl text-emerald-400 mt-0.5"><i class="fa-solid fa-hourglass-half"></i></span>
+                        <div>
+                            <p class="font-semibold group-hover:text-emerald-400 transition-colors" style="color: var(--text-main);">Countdown Timer</p>
+                            <p class="text-sm" style="color: var(--text-muted);">Set a custom event name and date, then watch a live countdown to it.</p>
+                        </div>
+                    </div>
+                    <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-right text-sm"></i></span>
+                </a>
             </div>
         </div>
 
-        
-
-        <!-- Marketplace / For Sale Section -->
+        <!-- Personal Marketplace / For Sale Section -->
         <div class="glass-card rounded-3xl p-8 mt-6">
             <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-6 font-bold flex items-center gap-2">
                 <span class="text-emerald-500">//</span> Personal Marketplace
@@ -366,10 +461,12 @@
                 </div>
             </div>
         </div>
-		 <!-- Semantic Footer Section -->
+
+        <!-- Semantic Footer Section -->
         <footer class="text-center mt-12 mb-6 mono text-xs text-slate-500 dark:text-slate-400">
             <p>© 2026 Naveen Siriwardhana. All Rights Reserved.</p>
         </footer>
+
     </div>
 
     <script>
