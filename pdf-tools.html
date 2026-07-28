@@ -411,7 +411,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
 <script>
@@ -544,20 +543,36 @@ function renderMergeList(){
     document.getElementById('merge-btn').disabled = mergeFiles.length < 2;
 }
 async function mergePdfs(){
-    setStatus('merge-status', 'Merging...');
+    if (mergeFiles.length < 2) { setStatus('merge-status', 'Add at least 2 PDF files first.'); return; }
+    setStatus('merge-status', 'Merging ' + mergeFiles.length + ' files...');
     try{
         const { PDFDocument } = PDFLib;
         const outDoc = await PDFDocument.create();
+        let totalSourcePages = 0;
         for (const f of mergeFiles) {
             const buf = await readFileAsArrayBuffer(f);
-            const src = await PDFDocument.load(buf, { ignoreEncryption: true });
-            const pages = await outDoc.copyPages(src, src.getPageIndices());
+            const src = await PDFDocument.load(buf, { ignoreEncryption: true, throwOnInvalidObject: false, updateMetadata: false });
+            const indices = src.getPageIndices();
+            totalSourcePages += indices.length;
+            if (!indices.length) { console.warn('No pages found in', f.name); continue; }
+            const pages = await outDoc.copyPages(src, indices);
             pages.forEach(p => outDoc.addPage(p));
+        }
+        const finalCount = outDoc.getPageCount();
+        if (finalCount === 0) {
+            setStatus('merge-status', 'Error: none of the selected files contained readable pages.');
+            return;
+        }
+        if (finalCount < totalSourcePages) {
+            console.warn('Merged page count (' + finalCount + ') is less than expected (' + totalSourcePages + ').');
         }
         const bytes = await outDoc.save();
         downloadBlob(new Blob([bytes], { type: 'application/pdf' }), 'merged.pdf');
-        setStatus('merge-status', 'Done — merged ' + mergeFiles.length + ' files.');
-    } catch(err){ setStatus('merge-status', 'Error: ' + err.message); }
+        setStatus('merge-status', 'Done — merged ' + mergeFiles.length + ' files into ' + finalCount + ' total pages.');
+    } catch(err){
+        console.error('Merge failed:', err);
+        setStatus('merge-status', 'Error: ' + err.message);
+    }
 }
 
 /* ================= 2. SPLIT ================= */
@@ -606,7 +621,9 @@ async function compressPdf(){
     const file = document.getElementById('compress-input').files[0];
     if (!file) return setStatus('compress-status', 'Select a PDF first.');
     const quality = document.getElementById('compress-quality').value;
-    const settings = { low: { scale: 0.7, jpeg: 0.4 }, medium: { scale: 1.0, jpeg: 0.6 }, high: { scale: 1.3, jpeg: 0.8 } }[quality];
+    // Scale is kept high enough (~150-220 DPI equivalent) so text stays sharp and readable.
+    // Compression is achieved mainly through JPEG quality, not by shrinking resolution drastically.
+    const settings = { low: { scale: 1.5, jpeg: 0.55 }, medium: { scale: 2.0, jpeg: 0.72 }, high: { scale: 2.6, jpeg: 0.88 } }[quality];
     setStatus('compress-status', 'Compressing — this can take a moment...');
     try{
         const buf = await readFileAsArrayBuffer(file);
@@ -765,6 +782,9 @@ async function repairPdf(){
 }
 
 /* ================= 7. PDF TO WORD ================= */
+function escapeHtml(str){
+    return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 async function pdfToWord(){
     const file = document.getElementById('p2w-input').files[0];
     if (!file) return setStatus('p2w-status', 'Select a PDF first.');
@@ -772,19 +792,26 @@ async function pdfToWord(){
     try{
         const buf = await readFileAsArrayBuffer(file);
         const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-        const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
-        const children = [];
+        let bodyHtml = '';
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
             const text = content.items.map(it => it.str).join(' ');
-            children.push(new Paragraph({ text: 'Page ' + i, heading: HeadingLevel.HEADING_3 }));
-            children.push(new Paragraph({ children: [new TextRun(text || ' ')] }));
+            bodyHtml += '<h3 style="color:#059669;font-size:14pt;margin-top:20pt;">Page ' + i + '</h3>';
+            bodyHtml += '<p style="font-size:11pt;line-height:1.5;white-space:pre-wrap;">' + (escapeHtml(text) || '&nbsp;') + '</p>';
         }
-        const outDoc = new Document({ sections: [{ children }] });
-        const blob = await Packer.toBlob(outDoc);
-        downloadBlob(blob, (file.name.replace(/\.pdf$/i, '') || 'document') + '.docx');
-        setStatus('p2w-status', 'Done — layout and images aren\'t preserved, only text.');
+        // Build a Word-compatible .doc file using the MS Word HTML/MHTML trick.
+        // This is a genuine, dependency-free way to produce a file Word can open directly,
+        // since no reliable browser-only docx-writer library was loading correctly.
+        const docHtml =
+            '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+            '<head><meta charset="utf-8"><title>' + escapeHtml(file.name) + '</title>' +
+            '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->' +
+            '<style>body{font-family:Calibri,Arial,sans-serif;} h3{page-break-before:always;}h3:first-of-type{page-break-before:avoid;}</style>' +
+            '</head><body>' + bodyHtml + '</body></html>';
+        const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
+        downloadBlob(blob, (file.name.replace(/\.pdf$/i, '') || 'document') + '.doc');
+        setStatus('p2w-status', 'Done — opens in Microsoft Word. Layout/images aren\'t preserved, only text.');
     } catch(err){ setStatus('p2w-status', 'Error: ' + err.message); }
 }
 
@@ -872,14 +899,40 @@ async function pdfToJpg(){
 }
 
 /* ================= 11. OFFICE TO PDF ================= */
+function waitForImagesToLoad(container){
+    const imgs = Array.from(container.querySelectorAll('img'));
+    return Promise.all(imgs.map(img => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise(resolve => {
+            img.addEventListener('load', resolve, { once: true });
+            img.addEventListener('error', resolve, { once: true });
+            // Safety timeout in case an image never fires load/error
+            setTimeout(resolve, 4000);
+        });
+    }));
+}
 async function wordToPdfBytes(file){
     const buf = await readFileAsArrayBuffer(file);
     const result = await mammoth.convertToHtml({ arrayBuffer: buf });
     const container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:40px;background:#ffffff;color:#000000;font-family:Arial,sans-serif;font-size:14px;';
-    container.innerHTML = result.value;
+    // Fixed width + reset styles so the document's visual paragraph/image order
+    // is preserved exactly as it appears in Word (no floats overlapping, no oversized images).
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:40px;background:#ffffff;color:#000000;font-family:Arial,sans-serif;font-size:14px;line-height:1.5;';
+    const style = document.createElement('style');
+    style.textContent = 'img{max-width:100%!important;height:auto!important;display:block;margin:10px 0;} table{border-collapse:collapse;width:100%;} td,th{border:1px solid #ccc;padding:4px 8px;} p{margin:0 0 10px 0;}';
+    container.appendChild(style);
+    const contentDiv = document.createElement('div');
+    contentDiv.innerHTML = result.value;
+    container.appendChild(contentDiv);
     document.body.appendChild(container);
-    const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#ffffff' });
+
+    // Crucial fix: wait for every embedded image to fully decode before rasterizing,
+    // otherwise html2canvas can capture the page before images are ready, making
+    // content appear to be missing or out of order.
+    await waitForImagesToLoad(container);
+    await new Promise(r => requestAnimationFrame(r));
+
+    const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
     document.body.removeChild(container);
     return canvasToPdfBytes(canvas);
 }
