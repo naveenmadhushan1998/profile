@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Trimmer | Naveen Siriwardhana</title>
+
+    <meta name="description" content="Trim video clips entirely in your browser — no upload, no server, 100% private and free.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --deep-blue: #0a192f;
+            --emerald-glow: #10b981;
+            --slate-accent: #64748b;
+            --bg-color: #0a192f;
+            --text-main: #ffffff;
+            --text-sub: #e2e8f0;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover-bg: rgba(255, 255, 255, 0.04);
+            --inner-box: rgba(255, 255, 255, 0.05);
+            --grid-color: rgba(16, 185, 129, 0.05);
+        }
+        html.light {
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(15, 23, 42, 0.08);
+            --card-hover-bg: rgba(255, 255, 255, 0.95);
+            --inner-box: rgba(15, 23, 42, 0.04);
+            --grid-color: rgba(16, 185, 129, 0.08);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-sub);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .grid-bg {
+            background-image: radial-gradient(circle at 2px 2px, var(--grid-color) 1px, transparent 0);
+            background-size: 30px 30px;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--inner-box);
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--emerald-glow);
+            cursor: pointer;
+            border: 3px solid var(--bg-color);
+            box-shadow: 0 0 0 1px var(--emerald-glow);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--emerald-glow);
+            cursor: pointer;
+            border: 3px solid var(--bg-color);
+        }
+        .drop-zone {
+            border: 2px dashed var(--card-border);
+            transition: all 0.2s ease;
+        }
+        .drop-zone.dragover {
+            border-color: var(--emerald-glow);
+            background: var(--card-hover-bg);
+        }
+        .progress-track {
+            background: var(--inner-box);
+        }
+        .progress-fill {
+            background: var(--emerald-glow);
+            transition: width 0.2s ease;
+        }
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-primary {
+            background: var(--emerald-glow);
+            color: #06281d;
+        }
+        .btn-primary:hover { filter: brightness(1.08); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+    </style>
+</head>
+<body class="grid-bg min-h-screen py-12 px-4 md:px-8">
+
+    <div class="max-w-3xl mx-auto container relative">
+
+        <!-- Top bar -->
+        <div class="flex justify-between items-center mb-4">
+            <a href="index.html" class="glass-card px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 hover:text-emerald-400 transition-all" style="color: var(--text-sub);">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+            <button id="theme-toggle" class="glass-card p-3 rounded-xl text-xl text-emerald-400 hover:text-emerald-300 focus:outline-none cursor-pointer" title="Toggle Theme">
+                <i id="theme-icon" class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+
+        <!-- Header Card -->
+        <div class="glass-card rounded-3xl p-8 text-center mb-6">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4 text-2xl text-emerald-400">
+                <i class="fa-solid fa-scissors"></i>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2" style="color: var(--text-main);">Video Trimmer</h1>
+            <p class="text-sm mb-4" style="color: var(--text-muted);">Cut a video down to the part you need. Runs 100% in your browser — nothing is ever uploaded anywhere.</p>
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-xs mono" style="color: var(--text-sub);">
+                <i class="fa-solid fa-shield-halved text-emerald-400"></i> Fully local &middot; No upload &middot; Works offline after first load
+            </div>
+        </div>
+
+        <!-- Main Tool Card -->
+        <div class="glass-card rounded-3xl p-8">
+
+            <!-- Drop / File select zone -->
+            <div id="drop-zone" class="drop-zone rounded-2xl p-8 text-center cursor-pointer mb-6" style="background: var(--inner-box);">
+                <i class="fa-solid fa-file-video text-3xl text-emerald-400 mb-3 block"></i>
+                <p class="font-semibold mb-1" style="color: var(--text-main);">Click to choose a video, or drag & drop</p>
+                <p class="text-xs" style="color: var(--text-muted);">MP4, WebM, MOV, MKV — processed locally on your device</p>
+                <input type="file" id="file-input" accept="video/*" class="hidden">
+            </div>
+
+            <!-- Loading FFmpeg engine -->
+            <div id="engine-status" class="hidden mb-6 p-4 rounded-xl border border-emerald-500/10 flex items-center gap-3" style="background: var(--inner-box);">
+                <i class="fa-solid fa-circle-notch spin text-emerald-400"></i>
+                <span class="text-sm" style="color: var(--text-sub);" id="engine-status-text">Loading trim engine (first time only)...</span>
+            </div>
+
+            <!-- Editor (hidden until a file is loaded) -->
+            <div id="editor" class="hidden">
+
+                <video id="preview" class="w-full rounded-xl mb-5 bg-black" controls></video>
+
+                <!-- Trim range -->
+                <div class="mb-2 flex justify-between text-xs mono" style="color: var(--text-muted);">
+                    <span>Start: <span id="start-label" class="text-emerald-400">0:00.0</span></span>
+                    <span>Duration: <span id="duration-label" class="text-emerald-400">0:00.0</span></span>
+                    <span>End: <span id="end-label" class="text-emerald-400">0:00.0</span></span>
+                </div>
+
+                <div class="relative py-2 mb-6">
+                    <input type="range" id="start-range" class="absolute w-full" min="0" max="100" step="0.1" value="0">
+                    <input type="range" id="end-range" class="absolute w-full" min="0" max="100" step="0.1" value="100">
+                </div>
+
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button id="preview-btn" class="px-4 py-2.5 rounded-xl text-sm font-bold border border-emerald-500/20 hover:border-emerald-500/40 transition-all" style="color: var(--text-sub); background: var(--inner-box);">
+                        <i class="fa-solid fa-play mr-1.5"></i> Preview Selection
+                    </button>
+                    <button id="reset-btn" class="px-4 py-2.5 rounded-xl text-sm font-bold border border-emerald-500/20 hover:border-emerald-500/40 transition-all" style="color: var(--text-sub); background: var(--inner-box);">
+                        <i class="fa-solid fa-rotate-left mr-1.5"></i> Reset Range
+                    </button>
+                    <label class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-emerald-500/10" style="color: var(--text-sub); background: var(--inner-box);">
+                        <input type="checkbox" id="fast-mode" class="accent-emerald-500" checked>
+                        Fast trim (no re-encode)
+                    </label>
+                </div>
+
+                <button id="trim-btn" class="btn-primary w-full py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-scissors"></i> Trim Video
+                </button>
+
+                <!-- Progress -->
+                <div id="progress-wrap" class="hidden mt-5">
+                    <div class="flex justify-between text-xs mono mb-1.5" style="color: var(--text-muted);">
+                        <span id="progress-label">Processing...</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-track h-2.5 rounded-full overflow-hidden">
+                        <div id="progress-fill" class="progress-fill h-full rounded-full" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Result -->
+                <div id="result-wrap" class="hidden mt-6 p-5 rounded-xl border border-emerald-500/20" style="background: var(--inner-box);">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl text-emerald-400"><i class="fa-solid fa-circle-check"></i></span>
+                        <div>
+                            <p class="font-bold" style="color: var(--text-main);">Trim complete</p>
+                            <p class="text-xs" style="color: var(--text-muted);" id="result-size"></p>
+                        </div>
+                    </div>
+                    <video id="result-preview" class="w-full rounded-xl mb-4 bg-black" controls></video>
+                    <a id="download-btn" class="btn-primary w-full py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2" download="trimmed-video.mp4">
+                        <i class="fa-solid fa-download"></i> Download Trimmed Video
+                    </a>
+                </div>
+
+                <p id="error-msg" class="hidden mt-4 text-sm text-red-400 flex items-start gap-2">
+                    <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                    <span></span>
+                </p>
+
+                <button id="choose-another-btn" class="hidden mt-4 text-xs mono text-center w-full hover:text-emerald-400 transition-colors" style="color: var(--text-muted);">
+                    <i class="fa-solid fa-rotate mr-1"></i> Choose a different video
+                </button>
+            </div>
+        </div>
+
+        <!-- Info card -->
+        <div class="glass-card rounded-3xl p-6 mt-6 text-xs" style="color: var(--text-muted);">
+            <p class="mb-2"><i class="fa-solid fa-circle-info text-emerald-400 mr-1"></i> <strong style="color: var(--text-sub);">Fast trim</strong> cuts on the nearest keyframe without re-encoding — instant, but the exact start point may shift by up to ~1 second. Turn it off for frame-accurate trimming (slower, re-encodes the video).</p>
+            <p><i class="fa-solid fa-lock text-emerald-400 mr-1"></i> Your video never leaves your device. Trimming runs with WebAssembly (ffmpeg.wasm) directly in this browser tab.</p>
+        </div>
+
+        <footer class="text-center mt-10 mb-6 mono text-xs text-slate-500 dark:text-slate-400">
+            <p>© 2026 Naveen Siriwardhana. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+    <script>
+        // ---------- Theme toggle (matches main site) ----------
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlElement = document.documentElement;
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        if (currentTheme === 'light') {
+            htmlElement.classList.add('light');
+            themeIcon.className = 'fa-solid fa-sun';
+        }
+        themeToggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('light')) {
+                htmlElement.classList.remove('light');
+                themeIcon.className = 'fa-solid fa-moon';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlElement.classList.add('light');
+                themeIcon.className = 'fa-solid fa-sun';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // ---------- Elements ----------
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const engineStatus = document.getElementById('engine-status');
+        const engineStatusText = document.getElementById('engine-status-text');
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        const startRange = document.getElementById('start-range');
+        const endRange = document.getElementById('end-range');
+        const startLabel = document.getElementById('start-label');
+        const endLabel = document.getElementById('end-label');
+        const durationLabel = document.getElementById('duration-label');
+        const previewBtn = document.getElementById('preview-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const trimBtn = document.getElementById('trim-btn');
+        const fastMode = document.getElementById('fast-mode');
+        const progressWrap = document.getElementById('progress-wrap');
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressLabel = document.getElementById('progress-label');
+        const resultWrap = document.getElementById('result-wrap');
+        const resultPreview = document.getElementById('result-preview');
+        const resultSize = document.getElementById('result-size');
+        const downloadBtn = document.getElementById('download-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const chooseAnotherBtn = document.getElementById('choose-another-btn');
+
+        let ffmpeg = null;
+        let engineReady = false;
+        let currentFile = null;
+        let videoDuration = 0;
+        let outputUrl = null;
+
+        function fmtTime(s) {
+            if (!isFinite(s)) return '0:00.0';
+            const m = Math.floor(s / 60);
+            const sec = (s % 60).toFixed(1);
+            return `${m}:${sec.padStart(4, '0')}`;
+        }
+
+        function showError(msg) {
+            errorMsg.querySelector('span').textContent = msg;
+            errorMsg.classList.remove('hidden');
+        }
+        function clearError() {
+            errorMsg.classList.add('hidden');
+        }
+
+        // ---------- FFmpeg engine (lazy loaded on first file) ----------
+        async function ensureEngine() {
+            if (engineReady) return;
+            engineStatus.classList.remove('hidden');
+            const { FFmpeg } = FFmpegWASM;
+            ffmpeg = new FFmpeg();
+            ffmpeg.on('log', ({ message }) => {
+                // console.log(message);
+            });
+            ffmpeg.on('progress', ({ progress }) => {
+                const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
+                progressFill.style.width = pct + '%';
+                progressPercent.textContent = pct + '%';
+            });
+            const base = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+            engineStatusText.textContent = 'Loading trim engine (first time only)...';
+            await ffmpeg.load({
+                coreURL: `${base}/ffmpeg-core.js`,
+                wasmURL: `${base}/ffmpeg-core.wasm`,
+            });
+            engineReady = true;
+            engineStatus.classList.add('hidden');
+        }
+
+        // ---------- File handling ----------
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) handleFile(fileInput.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('video/')) {
+                showError('Please choose a video file.');
+                return;
+            }
+            clearError();
+            currentFile = file;
+            resultWrap.classList.add('hidden');
+            progressWrap.classList.add('hidden');
+            const url = URL.createObjectURL(file);
+            preview.src = url;
+            preview.onloadedmetadata = () => {
+                videoDuration = preview.duration;
+                startRange.min = 0;
+                startRange.max = videoDuration;
+                startRange.value = 0;
+                endRange.min = 0;
+                endRange.max = videoDuration;
+                endRange.value = videoDuration;
+                updateLabels();
+                editor.classList.remove('hidden');
+                chooseAnotherBtn.classList.remove('hidden');
+                dropZone.classList.add('hidden');
+            };
+        }
+
+        chooseAnotherBtn.addEventListener('click', () => {
+            editor.classList.add('hidden');
+            chooseAnotherBtn.classList.add('hidden');
+            dropZone.classList.remove('hidden');
+            resultWrap.classList.add('hidden');
+            progressWrap.classList.add('hidden');
+            clearError();
+            fileInput.value = '';
+        });
+
+        // ---------- Range sliders ----------
+        function updateLabels() {
+            let s = parseFloat(startRange.value);
+            let e = parseFloat(endRange.value);
+            if (s > e - 0.1) {
+                if (this === startRange) { e = Math.min(videoDuration, s + 0.1); endRange.value = e; }
+                else { s = Math.max(0, e - 0.1); startRange.value = s; }
+            }
+            startLabel.textContent = fmtTime(s);
+            endLabel.textContent = fmtTime(e);
+            durationLabel.textContent = fmtTime(e - s);
+        }
+        startRange.addEventListener('input', updateLabels);
+        endRange.addEventListener('input', updateLabels);
+
+        previewBtn.addEventListener('click', () => {
+            preview.currentTime = parseFloat(startRange.value);
+            preview.play();
+            const endT = parseFloat(endRange.value);
+            const stopAtEnd = () => {
+                if (preview.currentTime >= endT) {
+                    preview.pause();
+                    preview.removeEventListener('timeupdate', stopAtEnd);
+                }
+            };
+            preview.addEventListener('timeupdate', stopAtEnd);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            startRange.value = 0;
+            endRange.value = videoDuration;
+            updateLabels();
+        });
+
+        // ---------- Trim ----------
+        trimBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+            clearError();
+            resultWrap.classList.add('hidden');
+            const start = parseFloat(startRange.value);
+            const end = parseFloat(endRange.value);
+            const duration = end - start;
+            if (duration <= 0) {
+                showError('Select a valid range before trimming.');
+                return;
+            }
+
+            trimBtn.disabled = true;
+            progressWrap.classList.remove('hidden');
+            progressFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+            progressLabel.textContent = engineReady ? 'Processing...' : 'Loading trim engine (first time only)...';
+
+            try {
+                await ensureEngine();
+                progressLabel.textContent = 'Processing...';
+
+                const { fetchFile } = FFmpegUtil;
+                const inputName = 'input' + (currentFile.name.match(/\.[^.]+$/)?.[0] || '.mp4');
+                const outputName = 'output.mp4';
+
+                await ffmpeg.writeFile(inputName, await fetchFile(currentFile));
+
+                const args = ['-ss', String(start), '-i', inputName, '-t', String(duration)];
+                if (fastMode.checked) {
+                    args.push('-c', 'copy');
+                } else {
+                    args.push('-c:v', 'libx264', '-c:a', 'aac', '-preset', 'veryfast');
+                }
+                args.push('-avoid_negative_ts', 'make_zero', outputName);
+
+                await ffmpeg.exec(args);
+
+                const data = await ffmpeg.readFile(outputName);
+                const blob = new Blob([data.buffer], { type: 'video/mp4' });
+                if (outputUrl) URL.revokeObjectURL(outputUrl);
+                outputUrl = URL.createObjectURL(blob);
+
+                resultPreview.src = outputUrl;
+                downloadBtn.href = outputUrl;
+                const baseName = currentFile.name.replace(/\.[^.]+$/, '');
+                downloadBtn.download = `${baseName}-trimmed.mp4`;
+                resultSize.textContent = `${(blob.size / (1024 * 1024)).toFixed(2)} MB · ${fmtTime(duration)} long`;
+
+                resultWrap.classList.remove('hidden');
+                resultWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                await ffmpeg.deleteFile(inputName);
+                await ffmpeg.deleteFile(outputName);
+            } catch (err) {
+                console.error(err);
+                if (fastMode.checked) {
+                    showError('Fast trim failed on this file (common with some formats/codecs). Try unchecking "Fast trim" and run it again.');
+                } else {
+                    showError('Something went wrong while trimming this video. Try a different file or format.');
+                }
+            } finally {
+                trimBtn.disabled = false;
+                progressWrap.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
