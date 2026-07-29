@@ -234,6 +234,7 @@
         </footer>
     </div>
 
+    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
     <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
     <script>
         // ---------- Theme toggle (matches main site) ----------
@@ -309,24 +310,33 @@
         async function ensureEngine() {
             if (engineReady) return;
             engineStatus.classList.remove('hidden');
-            const { FFmpeg } = FFmpegWASM;
-            ffmpeg = new FFmpeg();
-            ffmpeg.on('log', ({ message }) => {
-                // console.log(message);
-            });
-            ffmpeg.on('progress', ({ progress }) => {
-                const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
-                progressFill.style.width = pct + '%';
-                progressPercent.textContent = pct + '%';
-            });
-            const base = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-            engineStatusText.textContent = 'Loading trim engine (first time only)...';
-            await ffmpeg.load({
-                coreURL: `${base}/ffmpeg-core.js`,
-                wasmURL: `${base}/ffmpeg-core.wasm`,
-            });
-            engineReady = true;
-            engineStatus.classList.add('hidden');
+            try {
+                const { FFmpeg } = FFmpegWASM;
+                const { toBlobURL } = FFmpegUtil;
+                ffmpeg = new FFmpeg();
+                ffmpeg.on('log', ({ message }) => {
+                    // console.log(message);
+                });
+                ffmpeg.on('progress', ({ progress }) => {
+                    const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
+                    progressFill.style.width = pct + '%';
+                    progressPercent.textContent = pct + '%';
+                });
+                const base = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+                engineStatusText.textContent = 'Loading trim engine (first time only)...';
+                // Core files must be converted to blob URLs — loading them directly
+                // from a different origin (e.g. unpkg) fails on GitHub Pages / strict browsers.
+                await ffmpeg.load({
+                    coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'text/javascript'),
+                    wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm'),
+                });
+                engineReady = true;
+            } catch (err) {
+                console.error('Engine load failed:', err);
+                throw new Error('ENGINE_LOAD_FAILED');
+            } finally {
+                engineStatus.classList.add('hidden');
+            }
         }
 
         // ---------- File handling ----------
@@ -436,6 +446,7 @@
                 progressLabel.textContent = 'Processing...';
 
                 const { fetchFile } = FFmpegUtil;
+                if (!fetchFile) throw new Error('ENGINE_LOAD_FAILED');
                 const inputName = 'input' + (currentFile.name.match(/\.[^.]+$/)?.[0] || '.mp4');
                 const outputName = 'output.mp4';
 
@@ -469,14 +480,17 @@
                 await ffmpeg.deleteFile(outputName);
             } catch (err) {
                 console.error(err);
-                if (fastMode.checked) {
-                    showError('Fast trim failed on this file (common with some formats/codecs). Try unchecking "Fast trim" and run it again.');
+                if (String(err && err.message) === 'ENGINE_LOAD_FAILED') {
+                    showError('Could not load the trim engine. Check your internet connection (it needs to download ~30MB the first time) and try again. If it keeps failing, try a different browser (Chrome/Edge work best).');
+                } else if (fastMode.checked) {
+                    showError('Fast trim failed on this file (common with some formats/codecs, e.g. .mkv or .webm into .mp4). Try unchecking "Fast trim" and run it again.');
                 } else {
                     showError('Something went wrong while trimming this video. Try a different file or format.');
                 }
             } finally {
                 trimBtn.disabled = false;
                 progressWrap.classList.add('hidden');
+                engineStatus.classList.add('hidden');
             }
         });
     </script>
