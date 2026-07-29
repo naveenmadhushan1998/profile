@@ -107,6 +107,32 @@
         }
         .btn-primary:hover { filter: brightness(1.08); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+        .dual-range { height: 22px; }
+        .dual-range input[type="range"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            margin: 0;
+            background: transparent;
+            pointer-events: none;
+        }
+        .dual-range input[type="range"]::-webkit-slider-runnable-track {
+            background: var(--inner-box);
+            height: 6px;
+            border-radius: 999px;
+        }
+        .dual-range input[type="range"]::-moz-range-track {
+            background: var(--inner-box);
+            height: 6px;
+            border-radius: 999px;
+        }
+        .dual-range input[type="range"]::-webkit-slider-thumb {
+            pointer-events: auto;
+        }
+        .dual-range input[type="range"]::-moz-range-thumb {
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body class="grid-bg min-h-screen py-12 px-4 md:px-8">
@@ -164,9 +190,9 @@
                     <span>End: <span id="end-label" class="text-emerald-400">0:00.0</span></span>
                 </div>
 
-                <div class="relative py-2 mb-6">
-                    <input type="range" id="start-range" class="absolute w-full" min="0" max="100" step="0.1" value="0">
-                    <input type="range" id="end-range" class="absolute w-full" min="0" max="100" step="0.1" value="100">
+                <div class="relative py-2 mb-6 dual-range">
+                    <input type="range" id="start-range" min="0" max="100" step="0.1" value="0">
+                    <input type="range" id="end-range" min="0" max="100" step="0.1" value="100">
                 </div>
 
                 <div class="flex flex-wrap gap-3 mb-6">
@@ -322,18 +348,45 @@
                     progressFill.style.width = pct + '%';
                     progressPercent.textContent = pct + '%';
                 });
-                const base = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-                engineStatusText.textContent = 'Loading trim engine (first time only)...';
+
+                // The ffmpeg.js wrapper itself spins up an internal worker (814.ffmpeg.js)
+                // to talk to the core. That worker script is on unpkg's origin, and browsers
+                // block Workers constructed from a different origin than the page — so it
+                // must also be converted to a blob URL, just like the core files below.
+                let classWorkerURL;
+                try {
+                    const ffmpegWrapperBase = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd';
+                    classWorkerURL = await toBlobURL(`${ffmpegWrapperBase}/814.ffmpeg.js`, 'text/javascript');
+                } catch (err) {
+                    console.error('classWorkerURL fetch failed:', err);
+                    throw new Error('ENGINE_LOAD_FAILED::' + (err && (err.message || String(err)) || 'could not fetch ffmpeg worker script'));
+                }
+
                 // Core files must be converted to blob URLs — loading them directly
                 // from a different origin (e.g. unpkg) fails on GitHub Pages / strict browsers.
-                await ffmpeg.load({
-                    coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'text/javascript'),
-                    wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm'),
-                });
-                engineReady = true;
-            } catch (err) {
-                console.error('Engine load failed:', err);
-                throw new Error('ENGINE_LOAD_FAILED');
+                // Try two CDNs in case one is blocked or slow on the user's network.
+                const sources = [
+                    'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd',
+                    'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd',
+                ];
+                let lastErr = null;
+                for (const base of sources) {
+                    try {
+                        engineStatusText.textContent = 'Loading trim engine (first time only)...';
+                        const coreURL = await toBlobURL(`${base}/ffmpeg-core.js`, 'text/javascript');
+                        const wasmURL = await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm');
+                        await ffmpeg.load({ coreURL, wasmURL, classWorkerURL });
+                        engineReady = true;
+                        lastErr = null;
+                        break;
+                    } catch (err) {
+                        console.error('Engine load failed from', base, err);
+                        lastErr = err;
+                    }
+                }
+                if (!engineReady) {
+                    throw new Error('ENGINE_LOAD_FAILED::' + (lastErr && (lastErr.message || String(lastErr)) || 'unknown error'));
+                }
             } finally {
                 engineStatus.classList.add('hidden');
             }
@@ -480,12 +533,14 @@
                 await ffmpeg.deleteFile(outputName);
             } catch (err) {
                 console.error(err);
-                if (String(err && err.message) === 'ENGINE_LOAD_FAILED') {
-                    showError('Could not load the trim engine. Check your internet connection (it needs to download ~30MB the first time) and try again. If it keeps failing, try a different browser (Chrome/Edge work best).');
+                const msg = String(err && err.message || '');
+                if (msg.startsWith('ENGINE_LOAD_FAILED')) {
+                    const detail = msg.split('::')[1] || 'unknown error';
+                    showError('Could not load the trim engine (tried two CDNs). Details: ' + detail + '. This usually means your network/browser is blocking the ~30MB download — try a different network, disable ad-blockers for this page, or try Chrome/Edge.');
                 } else if (fastMode.checked) {
                     showError('Fast trim failed on this file (common with some formats/codecs, e.g. .mkv or .webm into .mp4). Try unchecking "Fast trim" and run it again.');
                 } else {
-                    showError('Something went wrong while trimming this video. Try a different file or format.');
+                    showError('Something went wrong while trimming this video: ' + (msg || 'unknown error') + '. Try a different file or format.');
                 }
             } finally {
                 trimBtn.disabled = false;
