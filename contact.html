@@ -145,6 +145,32 @@
             <p class="mono text-sm mt-2" style="color: var(--text-muted);">days to go</p>
             <p class="mono text-xs mt-4 text-emerald-400">May 10, 2027</p>
         </div>
+
+        <!-- Detailed Live Countdown -->
+        <div class="glass-card rounded-3xl p-8 mt-8 text-center">
+            <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-6 font-bold flex items-center justify-center gap-2">
+                <span class="text-emerald-500">//</span> Countdown Breakdown
+            </h3>
+            <div class="grid grid-cols-4 gap-3 md:gap-4">
+                <div class="rounded-2xl py-4 border border-emerald-500/10" style="background: var(--inner-box);">
+                    <div id="cd-months" class="text-3xl md:text-5xl font-extrabold tracking-tight" style="color: var(--text-main);">--</div>
+                    <p class="mono text-[10px] md:text-xs uppercase tracking-widest mt-2" style="color: var(--text-muted);">Months</p>
+                </div>
+                <div class="rounded-2xl py-4 border border-emerald-500/10" style="background: var(--inner-box);">
+                    <div id="cd-days" class="text-3xl md:text-5xl font-extrabold tracking-tight" style="color: var(--text-main);">--</div>
+                    <p class="mono text-[10px] md:text-xs uppercase tracking-widest mt-2" style="color: var(--text-muted);">Days</p>
+                </div>
+                <div class="rounded-2xl py-4 border border-emerald-500/10" style="background: var(--inner-box);">
+                    <div id="cd-hours" class="text-3xl md:text-5xl font-extrabold tracking-tight" style="color: var(--text-main);">--</div>
+                    <p class="mono text-[10px] md:text-xs uppercase tracking-widest mt-2" style="color: var(--text-muted);">Hours</p>
+                </div>
+                <div class="rounded-2xl py-4 border border-emerald-500/10" style="background: var(--inner-box);">
+                    <div id="cd-minutes" class="text-3xl md:text-5xl font-extrabold tracking-tight" style="color: var(--text-main);">--</div>
+                    <p class="mono text-[10px] md:text-xs uppercase tracking-widest mt-2" style="color: var(--text-muted);">Minutes</p>
+                </div>
+            </div>
+            <p class="mono text-xs mt-6 text-emerald-400">Until May 10, 2027</p>
+        </div>
     </div>
 
     <script>
@@ -154,6 +180,48 @@
             var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             var days = Math.max(0, Math.round((target - today) / 86400000));
             document.getElementById('days-left').textContent = days;
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var target = new Date(2027, 4, 10, 0, 0, 0); // May 10, 2027, 00:00 local time
+
+            // Add whole months to a date, clamping the day (e.g. Jan 31 + 1 month = Feb 28)
+            function addMonths(date, n) {
+                var d = new Date(date.getTime());
+                var day = d.getDate();
+                d.setDate(1);
+                d.setMonth(d.getMonth() + n);
+                var lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+                d.setDate(Math.min(day, lastDay));
+                return d;
+            }
+
+            function set(id, value) {
+                document.getElementById(id).textContent = String(value).padStart(2, '0');
+            }
+
+            function update() {
+                var now = new Date();
+                if (now >= target) {
+                    set('cd-months', 0); set('cd-days', 0); set('cd-hours', 0); set('cd-minutes', 0);
+                    return;
+                }
+                var months = (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth());
+                if (addMonths(now, months) > target) months--;
+                var rest = target - addMonths(now, months);
+                var days = Math.floor(rest / 86400000);
+                var hours = Math.floor((rest % 86400000) / 3600000);
+                var minutes = Math.floor((rest % 3600000) / 60000);
+                set('cd-months', months);
+                set('cd-days', days);
+                set('cd-hours', hours);
+                set('cd-minutes', minutes);
+            }
+
+            update();
+            setInterval(update, 1000);
         })();
     </script>
 
