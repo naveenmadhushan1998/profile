@@ -133,7 +133,29 @@
                 <span class="group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-up-right-from-square text-sm"></i></span>
             </a>
         </div>
+
+        <!-- Wedding Countdown -->
+        <div class="glass-card rounded-3xl p-8 mt-8 text-center">
+            <h3 class="mono text-xs uppercase tracking-widest text-emerald-400 mb-4 font-bold flex items-center justify-center gap-2">
+                <span class="text-emerald-500">//</span> Naveen &amp; Ayesha Wedding Day
+            </h3>
+            <div class="text-6xl md:text-7xl font-extrabold tracking-tight" style="color: var(--text-main);">
+                <span id="days-left">--</span>
+            </div>
+            <p class="mono text-sm mt-2" style="color: var(--text-muted);">days to go</p>
+            <p class="mono text-xs mt-4 text-emerald-400">May 10, 2027</p>
+        </div>
     </div>
+
+    <script>
+        (function () {
+            var target = new Date(2027, 4, 10); // May 10, 2027 (month is 0-based)
+            var now = new Date();
+            var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            var days = Math.max(0, Math.round((target - today) / 86400000));
+            document.getElementById('days-left').textContent = days;
+        })();
+    </script>
 
 </body>
 </html>
